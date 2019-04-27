@@ -18,18 +18,25 @@ fn create_window(gui: &GuiConfig) -> PistonWindow {
         .unwrap()
 }
 
-fn game_loop(mut window: PistonWindow) {
-    while let Some(e) = window.next() {
-        window.draw_2d(&e, |c, g| {
-            clear([1.0; 4], g);
-            rectangle(
-                [1.0, 0.0, 0.0, 1.0], // red
-                [0.0, 0.0, 100.0, 100.0],
-                c.transform,
-                g,
-            );
-        });
+fn game_loop(mut window: PistonWindow, logic: &Fn(), paint: &Fn(&mut PistonWindow, Event)) {
+    while let Some(event) = window.next() {
+        logic();
+        paint(&mut window, event)
     }
+}
+
+fn game_logic() {}
+
+fn game_painter(wnd: &mut PistonWindow, e: Event) {
+    wnd.draw_2d(&e, |c, g| {
+        clear([1.0; 4], g);
+        rectangle(
+            [1.0, 0.0, 0.0, 1.0], // red
+            [0.0, 0.0, 100.0, 100.0],
+            c.transform,
+            g,
+        );
+    });
 }
 
 fn main() {
@@ -39,7 +46,7 @@ fn main() {
     };
 
     let window = create_window(&gui);
-    game_loop(window);
+    game_loop(window, &game_logic, &game_painter);
 
     println!("Koniec!");
 }
