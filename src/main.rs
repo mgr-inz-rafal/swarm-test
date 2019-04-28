@@ -1,3 +1,4 @@
+extern crate gauchos;
 extern crate piston_window;
 
 use piston_window::*;
@@ -42,12 +43,19 @@ fn game_logic(world: &mut WorldState) {
 fn game_painter(wnd: &mut PistonWindow, e: Event, world: &WorldState) {
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
-        rectangle(
-            [1.0, 0.0, 0.0, 1.0], // red
-            [world.x, world.y, 100.0, 100.0],
-            c.transform,
-            g,
-        );
+
+        let indices = gauchos::get_active_gauchos_indices();
+        indices
+            .iter()
+            .for_each(|&gi| match gauchos::get_gaucho_position(gi) {
+                Ok(pos) => rectangle(
+                    [1.0, 0.0, 0.0, 1.0],
+                    [pos[0], pos[1], 100.0, 100.0],
+                    c.transform,
+                    g,
+                ),
+                Err(msg) => (),
+            })
     });
 }
 
@@ -58,6 +66,8 @@ fn main() {
     };
 
     let world_state = WorldState { x: 200.0, y: 100.0 };
+
+    gauchos::add_gaucho();
 
     let window = create_window(&gui);
     game_loop(window, world_state, &game_logic, &game_painter);
