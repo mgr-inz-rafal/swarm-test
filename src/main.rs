@@ -3,6 +3,8 @@ extern crate piston_window;
 
 use piston_window::*;
 
+const GAUCHO_SIZE: f64 = 30.0;
+
 struct GuiConfig {
     width: u16,
     height: u16,
@@ -48,9 +50,14 @@ where
     indices
         .iter()
         .for_each(|&gi| match gauchos::get_gaucho_position(gi) {
-            Ok(pos) => rectangle(
+            Ok(pos) => ellipse(
                 [1.0, 0.0, 0.0, 1.0],
-                [pos[0], pos[1], 100.0, 100.0],
+                [
+                    pos[0] - GAUCHO_SIZE / 2.0,
+                    pos[1] - GAUCHO_SIZE / 2.0,
+                    GAUCHO_SIZE,
+                    GAUCHO_SIZE,
+                ],
                 c.transform,
                 g,
             ),
@@ -74,7 +81,7 @@ fn main() {
     let world_state = WorldState { x: 200.0, y: 100.0 };
 
     let i = gauchos::add_gaucho();
-    let _ = gauchos::set_gaucho_position(i.unwrap(), [123.0, 70.0]);
+    let _ = gauchos::set_gaucho_position(i.unwrap(), [0.0, 0.0]);
 
     let i = gauchos::add_gaucho();
     let _ = gauchos::set_gaucho_position(i.unwrap(), [300.0, 150.0]);
