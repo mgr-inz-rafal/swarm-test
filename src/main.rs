@@ -4,6 +4,7 @@ extern crate piston_window;
 use piston_window::*;
 
 const GAUCHO_SIZE: f64 = 30.0;
+const SLOT_SIZE: f64 = 50.0;
 
 struct GuiConfig {
     width: u16,
@@ -42,27 +43,39 @@ fn game_logic(world: &mut WorldState) {
     world.x = world.x + 0.1;
 }
 
+macro_rules! paint_objects {
+    ( $i_indices: ident, $e_feeder: expr, $i_shapefn: ident, $i_ctx: ident, $i_gfx: ident, $e_color: expr, $i_size: ident ) => {
+        $i_indices.iter().for_each(|&gi| match $e_feeder(gi) {
+            Ok(pos) => $i_shapefn(
+                $e_color,
+                [
+                    pos[0] - $i_size / 2.0,
+                    pos[1] - $i_size / 2.0,
+                    $i_size,
+                    $i_size,
+                ],
+                $i_ctx.transform,
+                $i_gfx,
+            ),
+            Err(msg) => (),
+        })
+    };
+}
+
 fn paint_gauchos<G>(c: piston_window::Context, g: &mut G)
 where
     G: piston_window::Graphics,
 {
     let indices = gauchos::get_active_gauchos_indices();
-    indices
-        .iter()
-        .for_each(|&gi| match gauchos::get_gaucho_position(gi) {
-            Ok(pos) => ellipse(
-                [1.0, 0.0, 0.0, 1.0],
-                [
-                    pos[0] - GAUCHO_SIZE / 2.0,
-                    pos[1] - GAUCHO_SIZE / 2.0,
-                    GAUCHO_SIZE,
-                    GAUCHO_SIZE,
-                ],
-                c.transform,
-                g,
-            ),
-            Err(msg) => (),
-        })
+    paint_objects!(
+        indices,
+        gauchos::get_gaucho_position,
+        ellipse,
+        c,
+        g,
+        [1.0, 0.0, 0.0, 1.0],
+        GAUCHO_SIZE
+    );
 }
 
 fn paint_slots<G>(c: piston_window::Context, g: &mut G)
@@ -70,22 +83,15 @@ where
     G: piston_window::Graphics,
 {
     let indices = gauchos::get_active_slots_indices();
-    indices
-        .iter()
-        .for_each(|&gi| match gauchos::get_slot_position(gi) {
-            Ok(pos) => rectangle(
-                [0.0, 1.0, 0.0, 1.0],
-                [
-                    pos[0] - GAUCHO_SIZE / 2.0,
-                    pos[1] - GAUCHO_SIZE / 2.0,
-                    GAUCHO_SIZE,
-                    GAUCHO_SIZE,
-                ],
-                c.transform,
-                g,
-            ),
-            Err(msg) => (),
-        })
+    paint_objects!(
+        indices,
+        gauchos::get_slot_position,
+        rectangle,
+        c,
+        g,
+        [0.0, 1.0, 0.0, 1.0],
+        SLOT_SIZE
+    );
 }
 
 fn game_painter(wnd: &mut PistonWindow, e: Event, world: &WorldState) {
