@@ -1,6 +1,8 @@
+#[macro_use(gaucho, slot)]
 extern crate gauchos;
 extern crate piston_window;
 
+use gauchos::{Gaucho, Slot};
 use piston_window::*;
 
 const GAUCHO_SIZE: f64 = 30.0;
@@ -99,19 +101,11 @@ fn main() {
 
     let mut game = gauchos::new();
 
-    // TODO: Add macro "gaucho! (pos)"
-    game.add_gaucho(gauchos::Gaucho {
-        pos: gauchos::Position { x: 50.0, y: 100.0 },
-    });
-    game.add_gaucho(gauchos::Gaucho {
-        pos: gauchos::Position { x: 100.0, y: 90.0 },
-    });
-    game.add_slot(gauchos::Slot {
-        pos: gauchos::Position { x: 200.0, y: 200.0 },
-    });
-    game.add_slot(gauchos::Slot {
-        pos: gauchos::Position { x: 210.0, y: 300.0 },
-    });
+    game.add_gaucho(gaucho!(50.0, 50.0));
+    game.add_gaucho(gaucho!(100.0, 90.0));
+
+    game.add_slot(slot!(200.0, 200.0));
+    game.add_slot(slot!(210.0, 300.0));
 
     let window = create_window(&gui);
     game_loop(window, game, world_state, &game_logic, &game_painter);
