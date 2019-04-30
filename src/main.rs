@@ -29,13 +29,14 @@ fn create_window(gui: &GuiConfig) -> PistonWindow {
 
 fn game_loop(
     mut window: PistonWindow,
+    game: gauchos::Gauchos,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
-    paint: &Fn(&mut PistonWindow, Event, &WorldState),
+    paint: &Fn(&mut PistonWindow, &gauchos::Gauchos, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
-        paint(&mut window, event, &world)
+        paint(&mut window, &game, event)
     }
 }
 
@@ -44,32 +45,27 @@ fn game_logic(world: &mut WorldState) {
 }
 
 macro_rules! paint_objects {
-    ( $i_indices: ident, $e_feeder: expr, $i_shapefn: ident, $i_ctx: ident, $i_gfx: ident, $e_color: expr, $i_size: ident ) => {
-        $i_indices.iter().for_each(|&gi| match $e_feeder(gi) {
-            Ok(pos) => $i_shapefn(
-                $e_color,
-                [
-                    pos[0] - $i_size / 2.0,
-                    pos[1] - $i_size / 2.0,
+    ( $i_objects: expr, $i_shapefn: ident, $i_ctx: ident, $i_gfx: ident, $e_color: expr, $i_size: expr) => {
+        $i_objects.iter().for_each(|&i|
+            $i_shapefn($e_color,          [
+                    i.pos.x - $i_size / 2.0,
+                    i.pos.y - $i_size / 2.0,
                     $i_size,
                     $i_size,
                 ],
                 $i_ctx.transform,
                 $i_gfx,
-            ),
-            Err(msg) => (),
-        })
+            )
+        )
     };
 }
 
-fn paint_gauchos<G>(c: piston_window::Context, g: &mut G)
+fn paint_gauchos<G>(c: piston_window::Context, g: &mut G, game: &gauchos::Gauchos)
 where
     G: piston_window::Graphics,
 {
-    let indices = gauchos::get_active_gauchos_indices();
     paint_objects!(
-        indices,
-        gauchos::get_gaucho_position,
+        game.gauchos,
         ellipse,
         c,
         g,
@@ -78,27 +74,18 @@ where
     );
 }
 
-fn paint_slots<G>(c: piston_window::Context, g: &mut G)
+fn paint_slots<G>(c: piston_window::Context, g: &mut G, game: &gauchos::Gauchos)
 where
     G: piston_window::Graphics,
 {
-    let indices = gauchos::get_active_slots_indices();
-    paint_objects!(
-        indices,
-        gauchos::get_slot_position,
-        rectangle,
-        c,
-        g,
-        [0.0, 1.0, 0.0, 1.0],
-        SLOT_SIZE
-    );
+    paint_objects!(game.slots, rectangle, c, g, [0.0, 1.0, 0.0, 1.0], SLOT_SIZE);
 }
 
-fn game_painter(wnd: &mut PistonWindow, e: Event, world: &WorldState) {
+fn game_painter(wnd: &mut PistonWindow, game: &gauchos::Gauchos, e: Event) {
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
-        paint_gauchos(c, g);
-        paint_slots(c, g);
+        paint_gauchos(c, g, &game);
+        paint_slots(c, g, &game);
     });
 }
 
@@ -110,17 +97,24 @@ fn main() {
 
     let world_state = WorldState { x: 200.0, y: 100.0 };
 
-    let i = gauchos::add_gaucho();
-    let _ = gauchos::set_gaucho_position(i.unwrap(), [300.0, 150.0]);
+    let mut game = gauchos::new();
 
-    let s = gauchos::add_slot();
-    let s = gauchos::set_slot_position(s.unwrap(), [50.0, 50.0]);
-
-    let s = gauchos::add_slot();
-    let s = gauchos::set_slot_position(s.unwrap(), [250.0, 90.0]);
+    // TODO: Add macro "gaucho! (pos)"
+    game.add_gaucho(gauchos::Gaucho {
+        pos: gauchos::Position { x: 50.0, y: 100.0 },
+    });
+    game.add_gaucho(gauchos::Gaucho {
+        pos: gauchos::Position { x: 100.0, y: 90.0 },
+    });
+    game.add_slot(gauchos::Slot {
+        pos: gauchos::Position { x: 200.0, y: 200.0 },
+    });
+    game.add_slot(gauchos::Slot {
+        pos: gauchos::Position { x: 210.0, y: 300.0 },
+    });
 
     let window = create_window(&gui);
-    game_loop(window, world_state, &game_logic, &game_painter);
+    game_loop(window, game, world_state, &game_logic, &game_painter);
 
     println!("Koniec!");
 }
