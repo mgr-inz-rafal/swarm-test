@@ -13,10 +13,7 @@ struct GuiConfig {
     height: u16,
 }
 
-struct WorldState {
-    x: f64,
-    y: f64,
-}
+struct WorldState {}
 
 fn create_window(gui: &GuiConfig) -> PistonWindow {
     let size: Size = Size {
@@ -43,7 +40,7 @@ fn game_loop(
 }
 
 fn game_logic(world: &mut WorldState) {
-    world.x = world.x + 0.1;
+    // Mutate world state here
 }
 
 macro_rules! paint_objects {
@@ -97,7 +94,7 @@ fn main() {
         height: 600,
     };
 
-    let world_state = WorldState { x: 200.0, y: 100.0 };
+    let world_state = WorldState {};
 
     let mut game = gauchos::new();
 
