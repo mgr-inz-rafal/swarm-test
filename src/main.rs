@@ -1,8 +1,8 @@
-#[macro_use(gaucho, slot)]
+#[macro_use(bronco, slot)]
 extern crate gauchos;
 extern crate piston_window;
 
-use gauchos::{Gaucho, Slot};
+use gauchos::{Bronco, Slot};
 use piston_window::*;
 
 const GAUCHO_SIZE: f64 = 30.0;
@@ -64,7 +64,7 @@ where
     G: piston_window::Graphics,
 {
     paint_objects!(
-        game.gauchos,
+        game.broncos,
         ellipse,
         c,
         g,
@@ -98,8 +98,8 @@ fn main() {
 
     let mut game = gauchos::new();
 
-    game.add_gaucho(gaucho!(50.0, 50.0));
-    game.add_gaucho(gaucho!(100.0, 90.0));
+    game.add_bronco(bronco!(50.0, 50.0));
+    game.add_bronco(bronco!(100.0, 90.0));
 
     game.add_slot(slot!(200.0, 200.0));
     game.add_slot(slot!(210.0, 300.0));
