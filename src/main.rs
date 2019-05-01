@@ -48,8 +48,8 @@ macro_rules! paint_objects {
     ( $i_objects: expr, $i_shapefn: ident, $i_ctx: ident, $i_gfx: ident, $e_color: expr, $i_size: expr) => {
         $i_objects.iter().for_each(|&i|
             $i_shapefn($e_color,          [
-                    i.pos.x - $i_size / 2.0,
-                    i.pos.y - $i_size / 2.0,
+                    i.get_position().x - $i_size / 2.0,
+                    i.get_position().y - $i_size / 2.0,
                     $i_size,
                     $i_size,
                 ],
