@@ -3,7 +3,8 @@ extern crate swarm;
 extern crate piston_window;
 
 use piston_window::*;
-use swarm::{Carrier, Slot};
+use swarm::carrier::Carrier;
+use swarm::Slot;
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
@@ -102,6 +103,9 @@ fn main() {
     };
 
     let world_state = WorldState {};
+
+    let angle: f64 = 180.0;
+    let s = angle.sin();
 
     let mut game = swarm::new();
 
