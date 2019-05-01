@@ -2,8 +2,8 @@
 extern crate swarm;
 extern crate piston_window;
 
-use swarm::{Carrier, Slot};
 use piston_window::*;
+use swarm::{Carrier, Slot};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
@@ -64,7 +64,7 @@ where
     G: piston_window::Graphics,
 {
     paint_objects!(
-        game.carriers,
+        game.get_carriers(),
         ellipse,
         c,
         g,
@@ -77,7 +77,14 @@ fn paint_slots<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
 where
     G: piston_window::Graphics,
 {
-    paint_objects!(game.slots, rectangle, c, g, [0.0, 1.0, 0.0, 1.0], SLOT_SIZE);
+    paint_objects!(
+        game.get_slots(),
+        rectangle,
+        c,
+        g,
+        [0.0, 1.0, 0.0, 1.0],
+        SLOT_SIZE
+    );
 }
 
 fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, e: Event) {
