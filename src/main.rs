@@ -29,14 +29,15 @@ fn create_window(gui: &GuiConfig) -> PistonWindow {
 
 fn game_loop(
     mut window: PistonWindow,
-    game: swarm::Swarm,
+    mut game: swarm::Swarm,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
     paint: &Fn(&mut PistonWindow, &swarm::Swarm, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
-        paint(&mut window, &game, event)
+        paint(&mut window, &game, event);
+        game.tick();
     }
 }
 
