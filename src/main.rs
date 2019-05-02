@@ -61,7 +61,7 @@ macro_rules! paint_objects {
     };
 }
 
-fn paint_carriers<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
+fn paint_carriers_body<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
 where
     G: piston_window::Graphics,
 {
@@ -73,6 +73,33 @@ where
         [1.0, 0.0, 0.0, 1.0],
         CARRIER_SIZE
     );
+}
+
+fn rotate_point(point: (f64, f64), angle: f64, center: (f64, f64)) -> (f64, f64) {
+    (
+        angle.cos() * (point.0 - center.0) - angle.sin() * (point.1 - center.1) + center.0,
+        angle.sin() * (point.0 - center.0) + angle.cos() * (point.1 - center.1) + center.1,
+    )
+}
+
+fn paint_carriers_angle<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
+where
+    G: piston_window::Graphics,
+{
+    game.get_carriers().iter().for_each(|&x| {
+        let point = x.get_position();
+        let point = (point.x, point.y);
+        let end = (point.0 + CARRIER_SIZE / 2.0, point.1);
+        let end = rotate_point(end, x.get_angle(), point);
+
+        line(
+            [0.0, 0.0, 1.0, 1.0],
+            2.0,
+            [point.0, point.1, end.0, end.1],
+            c.transform,
+            g,
+        );
+    });
 }
 
 fn paint_slots<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
@@ -92,7 +119,8 @@ where
 fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, e: Event) {
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
-        paint_carriers(c, g, &game);
+        paint_carriers_body(c, g, &game);
+        paint_carriers_angle(c, g, &game);
         paint_slots(c, g, &game);
     });
 }
