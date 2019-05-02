@@ -11,7 +11,8 @@ use swarm::{Carrier, Slot};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
+const TARGET_SIZE: f64 = 10.0;
+const SIMULATION_TICKER: u128 = (1000.0 / 1.0) as u128; // 60 FPS
 
 struct GuiConfig {
     width: u16,
@@ -62,7 +63,7 @@ fn game_logic(world: &mut WorldState) {
 macro_rules! paint_objects {
     ( $i_objects: expr, $i_shapefn: ident, $i_ctx: ident, $i_gfx: ident, $e_color: expr, $i_size: expr) => {
         $i_objects.iter().for_each(|&i|
-            $i_shapefn($e_color,          [
+            $i_shapefn($e_color, [
                     i.get_position().x - $i_size / 2.0,
                     i.get_position().y - $i_size / 2.0,
                     $i_size,
@@ -116,6 +117,39 @@ where
     });
 }
 
+fn paint_carriers_target<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
+where
+    G: piston_window::Graphics,
+{
+    game.get_carriers()
+        .iter()
+        .for_each(|&x| match x.get_target() {
+            Some(target) => {
+                let position = x.get_position();
+                line(
+                    [0.0, 0.0, 0.0, 1.0],
+                    0.5,
+                    [target.0, target.1, position.x, position.y],
+                    c.transform,
+                    g,
+                );
+
+                ellipse(
+                    [0.0, 0.0, 1.0, 1.0],
+                    [
+                        target.0 - TARGET_SIZE / 2.0,
+                        target.1 - TARGET_SIZE / 2.0,
+                        TARGET_SIZE,
+                        TARGET_SIZE,
+                    ],
+                    c.transform,
+                    g,
+                )
+            }
+            None => {}
+        });
+}
+
 fn paint_slots<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
 where
     G: piston_window::Graphics,
@@ -167,6 +201,7 @@ fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiConfig, e:
         clear([1.0; 4], g);
         paint_carriers_body(c, g, &game);
         paint_carriers_angle(c, g, &game);
+        paint_carriers_target(c, g, &game);
         paint_slots(c, g, &game);
         paint_stats(c, g, &gui, factory);
     });
