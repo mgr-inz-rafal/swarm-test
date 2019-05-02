@@ -6,9 +6,8 @@ use piston_window::{
     clear, ellipse, line, rectangle, text, Event, Glyphs, Graphics, PistonWindow, Size,
     TextureSettings, Transformed, WindowSettings,
 };
-use std::time::{Duration, Instant};
-use swarm::carrier::Carrier;
-use swarm::Slot;
+use std::time::Instant;
+use swarm::{Carrier, Slot};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
@@ -49,10 +48,7 @@ fn game_loop(
         let now = Instant::now();
         let duration = now - world.time_since_last_tick;
 
-        if duration.as_millis() < SIMULATION_TICKER {
-
-        } else {
-            println!("Tick!");
+        if duration.as_millis() >= SIMULATION_TICKER {
             game.tick();
             world.time_since_last_tick = Instant::now();
         }
