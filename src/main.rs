@@ -12,7 +12,7 @@ use swarm::{Carrier, Slot};
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 1.0) as u128; // 60 FPS
+const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 
 struct GuiConfig {
     width: u16,
