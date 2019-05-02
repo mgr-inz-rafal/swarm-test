@@ -2,7 +2,10 @@
 extern crate swarm;
 extern crate piston_window;
 
-use piston_window::*;
+use piston_window::{
+    clear, ellipse, line, rectangle, text, Event, Glyphs, Graphics, PistonWindow, Size,
+    TextureSettings, Transformed, WindowSettings,
+};
 use swarm::carrier::Carrier;
 use swarm::Slot;
 
@@ -29,14 +32,15 @@ fn create_window(gui: &GuiConfig) -> PistonWindow {
 
 fn game_loop(
     mut window: PistonWindow,
+    gui: &GuiConfig,
     mut game: swarm::Swarm,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
-    paint: &Fn(&mut PistonWindow, &swarm::Swarm, Event),
+    paint: &Fn(&mut PistonWindow, &swarm::Swarm, &GuiConfig, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
-        paint(&mut window, &game, event);
+        paint(&mut window, &game, &gui, event);
         game.tick();
     }
 }
@@ -116,12 +120,45 @@ where
     );
 }
 
-fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, e: Event) {
+fn paint_stats<G>(
+    c: piston_window::Context,
+    g: &mut G,
+    gui: &GuiConfig,
+    factory: piston_window::GfxFactory,
+) where
+    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
+{
+    let mut stats_position = 20.0;
+    let font = "fonts/unispace.ttf";
+    let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
+    let text = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
+        "1000 fps",
+        &mut glyphs,
+        &c.draw_state,
+        transform,
+        g,
+    );
+    stats_position += 20.0;
+    let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
+    let text = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
+        "next stat",
+        &mut glyphs,
+        &c.draw_state,
+        transform,
+        g,
+    );
+    // stats_position += 20.0;
+}
+
+fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiConfig, e: Event) {
+    let factory = wnd.factory.clone();
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
         paint_carriers_body(c, g, &game);
         paint_carriers_angle(c, g, &game);
         paint_slots(c, g, &game);
+        paint_stats(c, g, &gui, factory);
     });
 }
 
@@ -133,9 +170,6 @@ fn main() {
 
     let world_state = WorldState {};
 
-    let angle: f64 = 180.0;
-    let s = angle.sin();
-
     let mut game = swarm::new();
 
     game.add_carrier(carrier!(50.0, 50.0));
@@ -145,7 +179,7 @@ fn main() {
     game.add_slot(slot!(210.0, 300.0));
 
     let window = create_window(&gui);
-    game_loop(window, game, world_state, &game_logic, &game_painter);
+    game_loop(window, &gui, game, world_state, &game_logic, &game_painter);
 
     println!("Koniec!");
 }

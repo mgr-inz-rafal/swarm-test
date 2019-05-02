@@ -6,4 +6,6 @@ edition = "2018"
 
 [dependencies]
 piston_window = "*"
+piston-gfx_texture = "*"
+gfx_device_gl = "*"
 swarm = { path = "../swarm" }
