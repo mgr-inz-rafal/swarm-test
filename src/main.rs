@@ -6,18 +6,23 @@ use piston_window::{
     clear, ellipse, line, rectangle, text, Event, Glyphs, Graphics, PistonWindow, Size,
     TextureSettings, Transformed, WindowSettings,
 };
+use std::time::{Duration, Instant};
 use swarm::carrier::Carrier;
 use swarm::Slot;
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
+const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 
 struct GuiConfig {
     width: u16,
     height: u16,
 }
 
-struct WorldState {}
+struct WorldState {
+    // Statistics
+    time_since_last_tick: Instant,
+}
 
 fn create_window(gui: &GuiConfig) -> PistonWindow {
     let size: Size = Size {
@@ -41,7 +46,16 @@ fn game_loop(
     while let Some(event) = window.next() {
         logic(&mut world);
         paint(&mut window, &game, &gui, event);
-        game.tick();
+        let now = Instant::now();
+        let duration = now - world.time_since_last_tick;
+
+        if duration.as_millis() < SIMULATION_TICKER {
+
+        } else {
+            println!("Tick!");
+            game.tick();
+            world.time_since_last_tick = Instant::now();
+        }
     }
 }
 
@@ -168,7 +182,9 @@ fn main() {
         height: 600,
     };
 
-    let world_state = WorldState {};
+    let world_state = WorldState {
+        time_since_last_tick: Instant::now(),
+    };
 
     let mut game = swarm::new();
 
