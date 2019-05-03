@@ -14,17 +14,19 @@ const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
 const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 
-struct GuiConfig {
+struct GuiData {
     width: u16,
     height: u16,
+    fps_counter: u16,
+    fps_current: u16,
 }
 
 struct WorldState {
-    // Statistics
     time_since_last_tick: Instant,
+    time_since_last_paint: Instant,
 }
 
-fn create_window(gui: &GuiConfig) -> PistonWindow {
+fn create_window(gui: &GuiData) -> PistonWindow {
     let size: Size = Size {
         height: f64::from(gui.height),
         width: f64::from(gui.width),
@@ -37,21 +39,29 @@ fn create_window(gui: &GuiConfig) -> PistonWindow {
 
 fn game_loop(
     mut window: PistonWindow,
-    gui: &GuiConfig,
+    gui: &mut GuiData,
     mut game: swarm::Swarm,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
-    paint: &Fn(&mut PistonWindow, &swarm::Swarm, &GuiConfig, Event),
+    paint: &Fn(&mut PistonWindow, &swarm::Swarm, &GuiData, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
         paint(&mut window, &game, &gui, event);
-        let now = Instant::now();
-        let duration = now - world.time_since_last_tick;
+        gui.fps_counter += 1;
 
-        if duration.as_millis() >= SIMULATION_TICKER {
+        let now = Instant::now();
+        let tick_duration = now - world.time_since_last_tick;
+        if tick_duration.as_millis() >= SIMULATION_TICKER {
             game.tick();
             world.time_since_last_tick = Instant::now();
+        }
+
+        let fps_duration = now - world.time_since_last_paint;
+        if fps_duration.as_secs() >= 1 {
+            gui.fps_current = gui.fps_counter;
+            gui.fps_counter = 0;
+            world.time_since_last_paint = Instant::now();
         }
     }
 }
@@ -167,17 +177,18 @@ where
 fn paint_stats<G>(
     c: piston_window::Context,
     g: &mut G,
-    gui: &GuiConfig,
+    gui: &GuiData,
     factory: piston_window::GfxFactory,
 ) where
-   G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>
+    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     let mut stats_position = 20.0;
     let font = "fonts/unispace.ttf";
     let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
     let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
-    let text = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
-        "1000 fps",
+    let to_draw = format!("{} fps", gui.fps_current);
+    let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
+        &to_draw,
         &mut glyphs,
         &c.draw_state,
         transform,
@@ -185,7 +196,7 @@ fn paint_stats<G>(
     );
     stats_position += 20.0;
     let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
-    let text = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
+    let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
         "next stat",
         &mut glyphs,
         &c.draw_state,
@@ -195,7 +206,7 @@ fn paint_stats<G>(
     // stats_position += 20.0;
 }
 
-fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiConfig, e: Event) {
+fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiData, e: Event) {
     let factory = wnd.factory.clone();
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
@@ -208,13 +219,16 @@ fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiConfig, e:
 }
 
 fn main() {
-    let gui = GuiConfig {
+    let mut gui = GuiData {
         width: 800,
         height: 600,
+        fps_counter: 0,
+        fps_current: 0,
     };
 
     let world_state = WorldState {
         time_since_last_tick: Instant::now(),
+        time_since_last_paint: Instant::now(),
     };
 
     let mut game = swarm::new();
@@ -226,7 +240,14 @@ fn main() {
     game.add_slot(slot!(210.0, 300.0));
 
     let window = create_window(&gui);
-    game_loop(window, &gui, game, world_state, &game_logic, &game_painter);
+    game_loop(
+        window,
+        &mut gui,
+        game,
+        world_state,
+        &game_logic,
+        &game_painter,
+    );
 
     println!("Koniec!");
 }
