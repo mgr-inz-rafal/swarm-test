@@ -170,7 +170,7 @@ fn paint_stats<G>(
     gui: &GuiConfig,
     factory: piston_window::GfxFactory,
 ) where
-    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
+   G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>
 {
     let mut stats_position = 20.0;
     let font = "fonts/unispace.ttf";
