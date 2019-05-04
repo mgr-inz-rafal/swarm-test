@@ -175,6 +175,10 @@ where
     );
 }
 
+struct Foo {
+    pub foo: Box<Fn(f64) -> f64>,
+}
+
 fn paint_slots_payloads<G>(
     c: piston_window::Context,
     g: &mut G,
@@ -183,46 +187,39 @@ fn paint_slots_payloads<G>(
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
-    game.get_slots().iter().for_each(|x| {
-        let payloads = x.get_payloads();
+    game.get_slots().iter().for_each(|slot| {
+        let Xcalculs = [Foo {
+            foo: Box::new(|pos: f64| pos - CURRENT_PAYLOAD_FONT_SIZE / 1.2),
+        }, Foo {
+            foo: Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0),
+        }];
 
-        match payloads.0 {
+
+        let Ycalculs = [Foo {
+            foo: Box::new(|pos: f64| pos),
+        }, Foo {
+            foo: Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0),
+        }];
+
+        let mut calc_index = 0;
+        slot.get_payloads().iter().for_each(|x| match x {
             Some(payload) => {
                 let font = "fonts/unispace.ttf";
                 let mut glyphs =
                     Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
-                let transform = c.transform.trans(
-                    x.get_position().x - CURRENT_PAYLOAD_FONT_SIZE / 1.2,
-                    x.get_position().y,
-                );
+                let px = slot.get_position().x;
+                let py = slot.get_position().y;
+                let transform = c
+                    .transform
+                    .trans((Xcalculs[calc_index].foo)(px), (Ycalculs[calc_index].foo)(py));
                 let to_draw = format!("{}", payload);
                 let _ =
                     text::Text::new_color([0.0, 0.0, 0.0, 1.0], CURRENT_PAYLOAD_FONT_SIZE as u32)
                         .draw(&to_draw, &mut glyphs, &c.draw_state, transform, g);
+                calc_index += 1;
             }
             None => {}
-        }
-
-        match payloads.1 {
-            Some(payload) => {
-                let font = "fonts/unispace.ttf";
-                let mut glyphs =
-                    Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
-                let transform = c.transform.trans(
-                    x.get_position().x + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0,
-                    x.get_position().y + SLOT_SIZE / 2.0 - 3.0,
-                );
-                let to_draw = format!("{}", payload);
-                let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 12).draw(
-                    &to_draw,
-                    &mut glyphs,
-                    &c.draw_state,
-                    transform,
-                    g,
-                );
-            }
-            None => {}
-        }
+        });
     })
 }
 
