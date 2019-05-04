@@ -160,7 +160,7 @@ where
         });
 }
 
-fn paint_slots<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
+fn paint_slots_body<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm)
 where
     G: piston_window::Graphics,
 {
@@ -174,17 +174,72 @@ where
     );
 }
 
+fn paint_slots_payloads<G>(
+    c: piston_window::Context,
+    g: &mut G,
+    game: &swarm::Swarm,
+    factory: &piston_window::GfxFactory,
+) where
+    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
+{
+    game.get_slots().iter().for_each(|x| {
+        let payloads = x.get_payloads();
+
+        match payloads.0 {
+            Some(payload) => {
+                let font = "fonts/unispace.ttf";
+                let mut glyphs =
+                    Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
+                let transform = c.transform.trans(
+                    x.get_position().x + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0,
+                    x.get_position().y + SLOT_SIZE / 2.0 - 3.0,
+                );
+                let to_draw = format!("{}", payload);
+                let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 12).draw(
+                    &to_draw,
+                    &mut glyphs,
+                    &c.draw_state,
+                    transform,
+                    g,
+                );
+            }
+            None => {}
+        }
+
+        match payloads.1 {
+            Some(payload) => {
+                let font = "fonts/unispace.ttf";
+                let mut glyphs =
+                    Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
+                let transform = c.transform.trans(
+                    x.get_position().x + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0,
+                    x.get_position().y + SLOT_SIZE / 2.0 - 3.0,
+                );
+                let to_draw = format!("{}", payload);
+                let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 12).draw(
+                    &to_draw,
+                    &mut glyphs,
+                    &c.draw_state,
+                    transform,
+                    g,
+                );
+            }
+            None => {}
+        }
+    })
+}
+
 fn paint_stats<G>(
     c: piston_window::Context,
     g: &mut G,
     gui: &GuiData,
-    factory: piston_window::GfxFactory,
+    factory: &piston_window::GfxFactory,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     let mut stats_position = 20.0;
     let font = "fonts/unispace.ttf";
-    let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    let mut glyphs = Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
     let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
     let to_draw = format!("{} fps", gui.fps_current);
     let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
@@ -213,8 +268,9 @@ fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiData, e: E
         paint_carriers_body(c, g, &game);
         paint_carriers_angle(c, g, &game);
         paint_carriers_target(c, g, &game);
-        paint_slots(c, g, &game);
-        paint_stats(c, g, &gui, factory);
+        paint_slots_body(c, g, &game);
+        paint_slots_payloads(c, g, &game, &factory);
+        paint_stats(c, g, &gui, &factory);
     });
 }
 
@@ -236,8 +292,8 @@ fn main() {
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
-    game.add_slot(slot!(200.0, 200.0));
-    game.add_slot(slot!(210.0, 300.0));
+    game.add_slot(slot!(200.0, 200.0, None, Some('A')));
+    game.add_slot(slot!(210.0, 300.0, None, Some('B')));
 
     let window = create_window(&gui);
     game_loop(
