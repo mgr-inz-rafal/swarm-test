@@ -13,6 +13,7 @@ const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
 const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
+const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 
 struct GuiData {
     width: u16,
@@ -191,17 +192,13 @@ fn paint_slots_payloads<G>(
                 let mut glyphs =
                     Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
                 let transform = c.transform.trans(
-                    x.get_position().x + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0,
-                    x.get_position().y + SLOT_SIZE / 2.0 - 3.0,
+                    x.get_position().x - CURRENT_PAYLOAD_FONT_SIZE / 1.2,
+                    x.get_position().y,
                 );
                 let to_draw = format!("{}", payload);
-                let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 12).draw(
-                    &to_draw,
-                    &mut glyphs,
-                    &c.draw_state,
-                    transform,
-                    g,
-                );
+                let _ =
+                    text::Text::new_color([0.0, 0.0, 0.0, 1.0], CURRENT_PAYLOAD_FONT_SIZE as u32)
+                        .draw(&to_draw, &mut glyphs, &c.draw_state, transform, g);
             }
             None => {}
         }
@@ -292,8 +289,9 @@ fn main() {
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
-    game.add_slot(slot!(200.0, 200.0, None, Some('A')));
-    game.add_slot(slot!(210.0, 300.0, None, Some('B')));
+    game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
+    game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
+    game.add_slot(slot!(350.0, 350.0, None, None));
 
     let window = create_window(&gui);
     game_loop(
