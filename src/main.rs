@@ -262,12 +262,12 @@ fn game_painter(
 ) {
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
-        paint_carriers_body(c, g, &game);
-        paint_carriers_angle(c, g, &game);
-        paint_carriers_target(c, g, &game);
         paint_slots_body(c, g, &game);
         paint_slots_payloads(c, g, &mut font_cache, &game, &gui);
         paint_stats(c, g, &mut font_cache, &gui);
+        paint_carriers_body(c, g, &game);
+        paint_carriers_angle(c, g, &game);
+        paint_carriers_target(c, g, &game);
     });
 }
 
