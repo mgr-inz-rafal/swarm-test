@@ -15,11 +15,17 @@ const TARGET_SIZE: f64 = 10.0;
 const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 
+struct Callbacks {
+    slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
+    slot_label_y_offsets: [Box<Fn(f64) -> f64>; 2],
+}
+
 struct GuiData {
     width: u16,
     height: u16,
     fps_counter: u16,
     fps_current: u16,
+    callbacks: Callbacks,
 }
 
 struct WorldState {
@@ -175,32 +181,16 @@ where
     );
 }
 
-struct Foo {
-    pub foo: Box<Fn(f64) -> f64>,
-}
-
 fn paint_slots_payloads<G>(
     c: piston_window::Context,
     g: &mut G,
     game: &swarm::Swarm,
+    gui: &GuiData,
     factory: &piston_window::GfxFactory,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     game.get_slots().iter().for_each(|slot| {
-        let Xcalculs = [Foo {
-            foo: Box::new(|pos: f64| pos - CURRENT_PAYLOAD_FONT_SIZE / 1.2),
-        }, Foo {
-            foo: Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0),
-        }];
-
-
-        let Ycalculs = [Foo {
-            foo: Box::new(|pos: f64| pos),
-        }, Foo {
-            foo: Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0),
-        }];
-
         let mut calc_index = 0;
         slot.get_payloads().iter().for_each(|x| match x {
             Some(payload) => {
@@ -209,9 +199,10 @@ fn paint_slots_payloads<G>(
                     Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
                 let px = slot.get_position().x;
                 let py = slot.get_position().y;
-                let transform = c
-                    .transform
-                    .trans((Xcalculs[calc_index].foo)(px), (Ycalculs[calc_index].foo)(py));
+                let transform = c.transform.trans(
+                    (gui.callbacks.slot_label_x_offsets[calc_index])(px),
+                    (gui.callbacks.slot_label_y_offsets[calc_index])(py),
+                );
                 let to_draw = format!("{}", payload);
                 let _ =
                     text::Text::new_color([0.0, 0.0, 0.0, 1.0], CURRENT_PAYLOAD_FONT_SIZE as u32)
@@ -263,7 +254,7 @@ fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiData, e: E
         paint_carriers_angle(c, g, &game);
         paint_carriers_target(c, g, &game);
         paint_slots_body(c, g, &game);
-        paint_slots_payloads(c, g, &game, &factory);
+        paint_slots_payloads(c, g, &game, &gui, &factory);
         paint_stats(c, g, &gui, &factory);
     });
 }
@@ -274,6 +265,16 @@ fn main() {
         height: 600,
         fps_counter: 0,
         fps_current: 0,
+        callbacks: Callbacks {
+            slot_label_x_offsets: [
+                { Box::new(|pos: f64| pos - CURRENT_PAYLOAD_FONT_SIZE / 1.2) },
+                { Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0) },
+            ],
+
+            slot_label_y_offsets: [{ Box::new(|pos: f64| pos) }, {
+                Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0)
+            }],
+        },
     };
 
     let world_state = WorldState {
