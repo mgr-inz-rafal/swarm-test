@@ -14,10 +14,12 @@ const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
 const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
+const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 
-struct Callbacks {
+struct LabelHelpers {
     slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
     slot_label_y_offsets: [Box<Fn(f64) -> f64>; 2],
+    slot_label_sizes: [f64; 2],
 }
 
 struct GuiData {
@@ -25,7 +27,7 @@ struct GuiData {
     height: u16,
     fps_counter: u16,
     fps_current: u16,
-    callbacks: Callbacks,
+    label_helpers: LabelHelpers,
 }
 
 struct FontCache {
@@ -202,19 +204,21 @@ fn paint_slots_payloads<G>(
                 let px = slot.get_position().x;
                 let py = slot.get_position().y;
                 let transform = c.transform.trans(
-                    (gui.callbacks.slot_label_x_offsets[calc_index])(px),
-                    (gui.callbacks.slot_label_y_offsets[calc_index])(py),
+                    (gui.label_helpers.slot_label_x_offsets[calc_index])(px),
+                    (gui.label_helpers.slot_label_y_offsets[calc_index])(py),
                 );
                 let to_draw = format!("{}", payload);
-                let _ =
-                    text::Text::new_color([0.0, 0.0, 0.0, 1.0], CURRENT_PAYLOAD_FONT_SIZE as u32)
-                        .draw(
-                            &to_draw,
-                            &mut font_cache.glyphs,
-                            &c.draw_state,
-                            transform,
-                            g,
-                        );
+                let _ = text::Text::new_color(
+                    [0.0, 0.0, 0.0, 1.0],
+                    gui.label_helpers.slot_label_sizes[calc_index] as u32,
+                )
+                .draw(
+                    &to_draw,
+                    &mut font_cache.glyphs,
+                    &c.draw_state,
+                    transform,
+                    g,
+                );
                 calc_index += 1;
             }
             None => {}
@@ -272,7 +276,7 @@ fn main() {
         height: 600,
         fps_counter: 0,
         fps_current: 0,
-        callbacks: Callbacks {
+        label_helpers: LabelHelpers {
             slot_label_x_offsets: [
                 { Box::new(|pos: f64| pos - CURRENT_PAYLOAD_FONT_SIZE / 1.2) },
                 { Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0) },
@@ -281,6 +285,7 @@ fn main() {
             slot_label_y_offsets: [{ Box::new(|pos: f64| pos) }, {
                 Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0)
             }],
+            slot_label_sizes: [CURRENT_PAYLOAD_FONT_SIZE, TARGET_PAYLOAD_FONT_SIZE],
         },
     };
 
