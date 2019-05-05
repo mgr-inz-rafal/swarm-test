@@ -189,9 +189,9 @@ where
 fn paint_slots_payloads<G>(
     c: piston_window::Context,
     g: &mut G,
+    font_cache: &mut FontCache,
     game: &swarm::Swarm,
     gui: &GuiData,
-    factory: &piston_window::GfxFactory,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
@@ -199,9 +199,6 @@ fn paint_slots_payloads<G>(
         let mut calc_index = 0;
         slot.get_payloads().iter().for_each(|x| match x {
             Some(payload) => {
-                let font = "fonts/unispace.ttf";
-                let mut glyphs =
-                    Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
                 let px = slot.get_position().x;
                 let py = slot.get_position().y;
                 let transform = c.transform.trans(
@@ -211,7 +208,13 @@ fn paint_slots_payloads<G>(
                 let to_draw = format!("{}", payload);
                 let _ =
                     text::Text::new_color([0.0, 0.0, 0.0, 1.0], CURRENT_PAYLOAD_FONT_SIZE as u32)
-                        .draw(&to_draw, &mut glyphs, &c.draw_state, transform, g);
+                        .draw(
+                            &to_draw,
+                            &mut font_cache.glyphs,
+                            &c.draw_state,
+                            transform,
+                            g,
+                        );
                 calc_index += 1;
             }
             None => {}
@@ -219,12 +222,8 @@ fn paint_slots_payloads<G>(
     })
 }
 
-fn paint_stats<G>(
-    c: piston_window::Context,
-    g: &mut G,
-    mut font_cache: &mut FontCache,
-    gui: &GuiData,
-) where
+fn paint_stats<G>(c: piston_window::Context, g: &mut G, font_cache: &mut FontCache, gui: &GuiData)
+where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     let mut stats_position = 20.0;
@@ -256,14 +255,13 @@ fn game_painter(
     gui: &GuiData,
     e: Event,
 ) {
-    let factory = wnd.factory.clone();
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
         paint_carriers_body(c, g, &game);
         paint_carriers_angle(c, g, &game);
         paint_carriers_target(c, g, &game);
         paint_slots_body(c, g, &game);
-        paint_slots_payloads(c, g, &game, &gui, &factory);
+        paint_slots_payloads(c, g, &mut font_cache, &game, &gui);
         paint_stats(c, g, &mut font_cache, &gui);
     });
 }
