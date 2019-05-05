@@ -149,11 +149,12 @@ where
         .iter()
         .for_each(|&x| match x.get_target() {
             Some(target) => {
+                let target = target.get_position();
                 let position = x.get_position();
                 line(
                     [0.0, 0.0, 0.0, 1.0],
                     0.5,
-                    [target.0, target.1, position.x, position.y],
+                    [target.x, target.y, position.x, position.y],
                     c.transform,
                     g,
                 );
@@ -161,8 +162,8 @@ where
                 ellipse(
                     [0.0, 0.0, 1.0, 1.0],
                     [
-                        target.0 - TARGET_SIZE / 2.0,
-                        target.1 - TARGET_SIZE / 2.0,
+                        target.x - TARGET_SIZE / 2.0,
+                        target.y - TARGET_SIZE / 2.0,
                         TARGET_SIZE,
                         TARGET_SIZE,
                     ],
