@@ -224,7 +224,6 @@ fn paint_stats<G>(
     g: &mut G,
     mut font_cache: &mut FontCache,
     gui: &GuiData,
-    factory: &piston_window::GfxFactory,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
@@ -265,7 +264,7 @@ fn game_painter(
         paint_carriers_target(c, g, &game);
         paint_slots_body(c, g, &game);
         paint_slots_payloads(c, g, &game, &gui, &factory);
-        paint_stats(c, g, &mut font_cache, &gui, &factory);
+        paint_stats(c, g, &mut font_cache, &gui);
     });
 }
 
