@@ -28,6 +28,10 @@ struct GuiData {
     callbacks: Callbacks,
 }
 
+struct FontCache {
+    glyphs: Glyphs,
+}
+
 struct WorldState {
     time_since_last_tick: Instant,
     time_since_last_paint: Instant,
@@ -46,15 +50,16 @@ fn create_window(gui: &GuiData) -> PistonWindow {
 
 fn game_loop(
     mut window: PistonWindow,
+    mut font_cache: &mut FontCache,
     gui: &mut GuiData,
     mut game: swarm::Swarm,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
-    paint: &Fn(&mut PistonWindow, &swarm::Swarm, &GuiData, Event),
+    paint: &Fn(&mut PistonWindow, &mut FontCache, &swarm::Swarm, &GuiData, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
-        paint(&mut window, &game, &gui, event);
+        paint(&mut window, &mut font_cache, &game, &gui, event);
         gui.fps_counter += 1;
 
         let now = Instant::now();
@@ -217,19 +222,18 @@ fn paint_slots_payloads<G>(
 fn paint_stats<G>(
     c: piston_window::Context,
     g: &mut G,
+    mut font_cache: &mut FontCache,
     gui: &GuiData,
     factory: &piston_window::GfxFactory,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     let mut stats_position = 20.0;
-    let font = "fonts/unispace.ttf";
-    let mut glyphs = Glyphs::new(font, factory.clone(), TextureSettings::new()).unwrap();
     let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
     let to_draw = format!("{} fps", gui.fps_current);
     let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
         &to_draw,
-        &mut glyphs,
+        &mut font_cache.glyphs,
         &c.draw_state,
         transform,
         g,
@@ -238,7 +242,7 @@ fn paint_stats<G>(
     let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
     let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
         "next stat",
-        &mut glyphs,
+        &mut font_cache.glyphs,
         &c.draw_state,
         transform,
         g,
@@ -246,7 +250,13 @@ fn paint_stats<G>(
     // stats_position += 20.0;
 }
 
-fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiData, e: Event) {
+fn game_painter(
+    wnd: &mut PistonWindow,
+    mut font_cache: &mut FontCache,
+    game: &swarm::Swarm,
+    gui: &GuiData,
+    e: Event,
+) {
     let factory = wnd.factory.clone();
     wnd.draw_2d(&e, |c, g| {
         clear([1.0; 4], g);
@@ -255,7 +265,7 @@ fn game_painter(wnd: &mut PistonWindow, game: &swarm::Swarm, gui: &GuiData, e: E
         paint_carriers_target(c, g, &game);
         paint_slots_body(c, g, &game);
         paint_slots_payloads(c, g, &game, &gui, &factory);
-        paint_stats(c, g, &gui, &factory);
+        paint_stats(c, g, &mut font_cache, &gui, &factory);
     });
 }
 
@@ -292,8 +302,17 @@ fn main() {
     game.add_slot(slot!(350.0, 350.0, None, None));
 
     let window = create_window(&gui);
+    let mut font_cache = FontCache {
+        glyphs: Glyphs::new(
+            "fonts/unispace.ttf",
+            window.factory.clone(),
+            TextureSettings::new(),
+        )
+        .unwrap(),
+    };
     game_loop(
         window,
+        &mut font_cache,
         &mut gui,
         game,
         world_state,
