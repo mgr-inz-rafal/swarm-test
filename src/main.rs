@@ -149,7 +149,7 @@ where
         .iter()
         .for_each(|&x| match x.get_target() {
             Some(target) => {
-                let target = target.get_position();
+                let target = game.get_slots()[target].get_position();
                 let position = x.get_position();
                 line(
                     [0.0, 0.0, 0.0, 1.0],
