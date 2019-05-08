@@ -304,7 +304,7 @@ fn main() {
 
     game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
     game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
-    game.add_slot(slot!(350.0, 350.0, None, None));
+    game.add_slot(slot!(750.0, 350.0, None, Some('B')));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
