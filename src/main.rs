@@ -25,7 +25,7 @@ struct LabelHelpers {
     carrier_label_size: f64,
     carrier_state_x_offset: Box<Fn(f64) -> f64>,
     carrier_state_y_offset: Box<Fn(f64) -> f64>,
-    carrier_state_size: f64
+    carrier_state_size: f64,
 }
 
 struct GuiData {
@@ -195,6 +195,20 @@ where
     );
 }
 
+fn carrier_state_to_string(state: swarm::State) -> &'static str {
+    match state {
+        swarm::State::IDLE => "Idle",
+        swarm::State::TARGETING(_) => "Targeting",
+        swarm::State::MOVING(_) => "Moving",
+        swarm::State::PICKINGUP(_) => "Picking up",
+        swarm::State::LOOKINGFORTARGET => "Looking where to drop",
+        swarm::State::NOTARGET => "Can't find target to drop",
+        swarm::State::DELIVERING(_) => "Delivering payload",
+        swarm::State::PUTTINGDOWN(_) => "Putting down",
+        swarm::State::_DEBUG_ => "Beret",
+    }
+}
+
 fn paint_carriers_payload<G>(
     c: piston_window::Context,
     g: &mut G,
@@ -204,9 +218,9 @@ fn paint_carriers_payload<G>(
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
-    game.get_carriers().iter().for_each(|carrier| {
-
-        match carrier.get_payload() {
+    game.get_carriers()
+        .iter()
+        .for_each(|carrier| match carrier.get_payload() {
             Some(payload) => {
                 {
                     let px = carrier.get_position().x;
@@ -219,7 +233,6 @@ fn paint_carriers_payload<G>(
                     let _ = text::Text::new_color(
                         [0.0, 0.0, 0.0, 1.0],
                         gui.label_helpers.carrier_label_size as u32,
-                        
                     )
                     .draw(
                         &to_draw,
@@ -237,11 +250,10 @@ fn paint_carriers_payload<G>(
                         (gui.label_helpers.carrier_state_x_offset)(px),
                         (gui.label_helpers.carrier_state_y_offset)(py),
                     );
-                    let to_draw = format!("{}", "Dupa");
+                    let to_draw = format!("{}", carrier_state_to_string(carrier.get_state()));
                     let _ = text::Text::new_color(
                         [0.0, 0.0, 0.0, 1.0],
                         gui.label_helpers.carrier_state_size as u32,
-                        
                     )
                     .draw(
                         &to_draw,
@@ -253,34 +265,26 @@ fn paint_carriers_payload<G>(
                 }
             }
             None => {
-                                {
-                    let px = carrier.get_position().x;
-                    let py = carrier.get_position().y;
-                    let transform = c.transform.trans(
-                        (gui.label_helpers.carrier_state_x_offset)(px),
-                        (gui.label_helpers.carrier_state_y_offset)(py),
-                    );
-                    let to_draw = format!("{}", "Dupa");
-                    let _ = text::Text::new_color(
-                        [0.0, 0.0, 0.0, 1.0],
-                        gui.label_helpers.carrier_state_size as u32,
-                        
-                    )
-                    .draw(
-                        &to_draw,
-                        &mut font_cache.glyphs,
-                        &c.draw_state,
-                        transform,
-                        g,
-                    );
-                }
-
+                let px = carrier.get_position().x;
+                let py = carrier.get_position().y;
+                let transform = c.transform.trans(
+                    (gui.label_helpers.carrier_state_x_offset)(px),
+                    (gui.label_helpers.carrier_state_y_offset)(py),
+                );
+                let to_draw = format!("{}", "Dupa");
+                let _ = text::Text::new_color(
+                    [0.0, 0.0, 0.0, 1.0],
+                    gui.label_helpers.carrier_state_size as u32,
+                )
+                .draw(
+                    &to_draw,
+                    &mut font_cache.glyphs,
+                    &c.draw_state,
+                    transform,
+                    g,
+                );
             }
-        }
-
-
-    }
-    );
+        });
 }
 
 fn paint_slots_payloads<G>(
@@ -316,7 +320,7 @@ fn paint_slots_payloads<G>(
                         g,
                     );
                 }
-                None => {},
+                None => {}
             };
             calc_index += 1;
         });
@@ -383,12 +387,12 @@ fn main() {
                 Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0)
             }],
             slot_label_sizes: [CURRENT_PAYLOAD_FONT_SIZE, TARGET_PAYLOAD_FONT_SIZE],
-            carrier_label_x_offset: {Box::new(|pos: f64| pos + CARRIER_SIZE / 2.0)},
-            carrier_label_y_offset: {Box::new(|pos: f64| pos )},
+            carrier_label_x_offset: { Box::new(|pos: f64| pos + CARRIER_SIZE / 2.0) },
+            carrier_label_y_offset: { Box::new(|pos: f64| pos) },
             carrier_label_size: 16.0,
-            carrier_state_x_offset: {Box::new(|pos: f64| pos - CARRIER_SIZE / 2.0)},
-            carrier_state_y_offset: {Box::new(|pos: f64| pos + CARRIER_SIZE / 1.2)},
-            carrier_state_size: 12.0
+            carrier_state_x_offset: { Box::new(|pos: f64| pos - CARRIER_SIZE / 2.0) },
+            carrier_state_y_offset: { Box::new(|pos: f64| pos + CARRIER_SIZE / 1.2) },
+            carrier_state_size: 12.0,
         },
     };
 
