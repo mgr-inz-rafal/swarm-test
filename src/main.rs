@@ -20,6 +20,12 @@ struct LabelHelpers {
     slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
     slot_label_y_offsets: [Box<Fn(f64) -> f64>; 2],
     slot_label_sizes: [f64; 2],
+    carrier_label_x_offset: Box<Fn(f64) -> f64>,
+    carrier_label_y_offset: Box<Fn(f64) -> f64>,
+    carrier_label_size: f64,
+    carrier_state_x_offset: Box<Fn(f64) -> f64>,
+    carrier_state_y_offset: Box<Fn(f64) -> f64>,
+    carrier_state_size: f64
 }
 
 struct GuiData {
@@ -189,6 +195,94 @@ where
     );
 }
 
+fn paint_carriers_payload<G>(
+    c: piston_window::Context,
+    g: &mut G,
+    font_cache: &mut FontCache,
+    game: &swarm::Swarm,
+    gui: &GuiData,
+) where
+    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
+{
+    game.get_carriers().iter().for_each(|carrier| {
+
+        match carrier.get_payload() {
+            Some(payload) => {
+                {
+                    let px = carrier.get_position().x;
+                    let py = carrier.get_position().y;
+                    let transform = c.transform.trans(
+                        (gui.label_helpers.carrier_label_x_offset)(px),
+                        (gui.label_helpers.carrier_label_y_offset)(py),
+                    );
+                    let to_draw = format!("{}", payload);
+                    let _ = text::Text::new_color(
+                        [0.0, 0.0, 0.0, 1.0],
+                        gui.label_helpers.carrier_label_size as u32,
+                        
+                    )
+                    .draw(
+                        &to_draw,
+                        &mut font_cache.glyphs,
+                        &c.draw_state,
+                        transform,
+                        g,
+                    );
+                }
+
+                {
+                    let px = carrier.get_position().x;
+                    let py = carrier.get_position().y;
+                    let transform = c.transform.trans(
+                        (gui.label_helpers.carrier_state_x_offset)(px),
+                        (gui.label_helpers.carrier_state_y_offset)(py),
+                    );
+                    let to_draw = format!("{}", "Dupa");
+                    let _ = text::Text::new_color(
+                        [0.0, 0.0, 0.0, 1.0],
+                        gui.label_helpers.carrier_state_size as u32,
+                        
+                    )
+                    .draw(
+                        &to_draw,
+                        &mut font_cache.glyphs,
+                        &c.draw_state,
+                        transform,
+                        g,
+                    );
+                }
+            }
+            None => {
+                                {
+                    let px = carrier.get_position().x;
+                    let py = carrier.get_position().y;
+                    let transform = c.transform.trans(
+                        (gui.label_helpers.carrier_state_x_offset)(px),
+                        (gui.label_helpers.carrier_state_y_offset)(py),
+                    );
+                    let to_draw = format!("{}", "Dupa");
+                    let _ = text::Text::new_color(
+                        [0.0, 0.0, 0.0, 1.0],
+                        gui.label_helpers.carrier_state_size as u32,
+                        
+                    )
+                    .draw(
+                        &to_draw,
+                        &mut font_cache.glyphs,
+                        &c.draw_state,
+                        transform,
+                        g,
+                    );
+                }
+
+            }
+        }
+
+
+    }
+    );
+}
+
 fn paint_slots_payloads<G>(
     c: piston_window::Context,
     g: &mut G,
@@ -206,8 +300,8 @@ fn paint_slots_payloads<G>(
                     let px = slot.get_position().x;
                     let py = slot.get_position().y;
                     let transform = c.transform.trans(
-                        (gui.label_helpers.slot_label_x_offsets[calc_index])(px),
-                        (gui.label_helpers.slot_label_y_offsets[calc_index])(py),
+                        gui.label_helpers.slot_label_x_offsets[calc_index](px),
+                        gui.label_helpers.slot_label_y_offsets[calc_index](py),
                     );
                     let to_draw = format!("{}", payload);
                     let _ = text::Text::new_color(
@@ -270,6 +364,7 @@ fn game_painter(
         paint_carriers_body(c, g, &game);
         paint_carriers_angle(c, g, &game);
         paint_carriers_target(c, g, &game);
+        paint_carriers_payload(c, g, &mut font_cache, &game, &gui);
     });
 }
 
@@ -284,11 +379,16 @@ fn main() {
                 { Box::new(|pos: f64| pos - CURRENT_PAYLOAD_FONT_SIZE / 1.2) },
                 { Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - SLOT_SIZE / 4.0) },
             ],
-
             slot_label_y_offsets: [{ Box::new(|pos: f64| pos) }, {
                 Box::new(|pos: f64| pos + SLOT_SIZE / 2.0 - 3.0)
             }],
             slot_label_sizes: [CURRENT_PAYLOAD_FONT_SIZE, TARGET_PAYLOAD_FONT_SIZE],
+            carrier_label_x_offset: {Box::new(|pos: f64| pos + CARRIER_SIZE / 2.0)},
+            carrier_label_y_offset: {Box::new(|pos: f64| pos )},
+            carrier_label_size: 16.0,
+            carrier_state_x_offset: {Box::new(|pos: f64| pos - CARRIER_SIZE / 2.0)},
+            carrier_state_y_offset: {Box::new(|pos: f64| pos + CARRIER_SIZE / 1.2)},
+            carrier_state_size: 12.0
         },
     };
 
