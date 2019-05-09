@@ -222,59 +222,16 @@ fn paint_carriers_payload<G>(
         .iter()
         .for_each(|carrier| match carrier.get_payload() {
             Some(payload) => {
-                {
-                    let px = carrier.get_position().x;
-                    let py = carrier.get_position().y;
-                    let transform = c.transform.trans(
-                        (gui.label_helpers.carrier_label_x_offset)(px),
-                        (gui.label_helpers.carrier_label_y_offset)(py),
-                    );
-                    let to_draw = format!("{}", payload);
-                    let _ = text::Text::new_color(
-                        [0.0, 0.0, 0.0, 1.0],
-                        gui.label_helpers.carrier_label_size as u32,
-                    )
-                    .draw(
-                        &to_draw,
-                        &mut font_cache.glyphs,
-                        &c.draw_state,
-                        transform,
-                        g,
-                    );
-                }
-
-                {
-                    let px = carrier.get_position().x;
-                    let py = carrier.get_position().y;
-                    let transform = c.transform.trans(
-                        (gui.label_helpers.carrier_state_x_offset)(px),
-                        (gui.label_helpers.carrier_state_y_offset)(py),
-                    );
-                    let to_draw = format!("{}", carrier_state_to_string(carrier.get_state()));
-                    let _ = text::Text::new_color(
-                        [0.0, 0.0, 0.0, 1.0],
-                        gui.label_helpers.carrier_state_size as u32,
-                    )
-                    .draw(
-                        &to_draw,
-                        &mut font_cache.glyphs,
-                        &c.draw_state,
-                        transform,
-                        g,
-                    );
-                }
-            }
-            None => {
                 let px = carrier.get_position().x;
                 let py = carrier.get_position().y;
                 let transform = c.transform.trans(
-                    (gui.label_helpers.carrier_state_x_offset)(px),
-                    (gui.label_helpers.carrier_state_y_offset)(py),
+                    (gui.label_helpers.carrier_label_x_offset)(px),
+                    (gui.label_helpers.carrier_label_y_offset)(py),
                 );
-                let to_draw = format!("{}", "Dupa");
+                let to_draw = format!("{}", payload);
                 let _ = text::Text::new_color(
                     [0.0, 0.0, 0.0, 1.0],
-                    gui.label_helpers.carrier_state_size as u32,
+                    gui.label_helpers.carrier_label_size as u32,
                 )
                 .draw(
                     &to_draw,
@@ -284,7 +241,39 @@ fn paint_carriers_payload<G>(
                     g,
                 );
             }
+            None => {}
         });
+}
+
+fn paint_carriers_state<G>(
+    c: piston_window::Context,
+    g: &mut G,
+    font_cache: &mut FontCache,
+    game: &swarm::Swarm,
+    gui: &GuiData,
+) where
+    G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
+{
+    game.get_carriers().iter().for_each(|carrier| {
+        let px = carrier.get_position().x;
+        let py = carrier.get_position().y;
+        let transform = c.transform.trans(
+            (gui.label_helpers.carrier_state_x_offset)(px),
+            (gui.label_helpers.carrier_state_y_offset)(py),
+        );
+        let to_draw = format!("{}", carrier_state_to_string(carrier.get_state()));
+        let _ = text::Text::new_color(
+            [0.0, 0.0, 0.0, 1.0],
+            gui.label_helpers.carrier_state_size as u32,
+        )
+        .draw(
+            &to_draw,
+            &mut font_cache.glyphs,
+            &c.draw_state,
+            transform,
+            g,
+        );
+    });
 }
 
 fn paint_slots_payloads<G>(
@@ -369,6 +358,7 @@ fn game_painter(
         paint_carriers_angle(c, g, &game);
         paint_carriers_target(c, g, &game);
         paint_carriers_payload(c, g, &mut font_cache, &game, &gui);
+        paint_carriers_state(c, g, &mut font_cache, &game, &gui);
     });
 }
 
