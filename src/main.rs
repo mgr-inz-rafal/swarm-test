@@ -218,31 +218,28 @@ fn paint_carriers_payload<G>(
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
-    game.get_carriers()
-        .iter()
-        .for_each(|carrier| match carrier.get_payload() {
-            Some(payload) => {
-                let px = carrier.get_position().x;
-                let py = carrier.get_position().y;
-                let transform = c.transform.trans(
-                    (gui.label_helpers.carrier_label_x_offset)(px),
-                    (gui.label_helpers.carrier_label_y_offset)(py),
-                );
-                let to_draw = format!("{}", payload);
-                let _ = text::Text::new_color(
-                    [0.0, 0.0, 0.0, 1.0],
-                    gui.label_helpers.carrier_label_size as u32,
-                )
-                .draw(
-                    &to_draw,
-                    &mut font_cache.glyphs,
-                    &c.draw_state,
-                    transform,
-                    g,
-                );
-            }
-            None => {}
-        });
+    game.get_carriers().iter().for_each(|carrier| {
+        if let Some(payload) = carrier.get_payload() {
+            let px = carrier.get_position().x;
+            let py = carrier.get_position().y;
+            let transform = c.transform.trans(
+                (gui.label_helpers.carrier_label_x_offset)(px),
+                (gui.label_helpers.carrier_label_y_offset)(py),
+            );
+            let to_draw = format!("{}", payload);
+            let _ = text::Text::new_color(
+                [0.0, 0.0, 0.0, 1.0],
+                gui.label_helpers.carrier_label_size as u32,
+            )
+            .draw(
+                &to_draw,
+                &mut font_cache.glyphs,
+                &c.draw_state,
+                transform,
+                g,
+            );
+        }
+    });
 }
 
 fn paint_carriers_state<G>(
@@ -288,29 +285,26 @@ fn paint_slots_payloads<G>(
     game.get_slots().iter().for_each(|slot| {
         let mut calc_index = 0;
         slot.get_payloads().iter().for_each(|x| {
-            match x {
-                Some(payload) => {
-                    let px = slot.get_position().x;
-                    let py = slot.get_position().y;
-                    let transform = c.transform.trans(
-                        gui.label_helpers.slot_label_x_offsets[calc_index](px),
-                        gui.label_helpers.slot_label_y_offsets[calc_index](py),
-                    );
-                    let to_draw = format!("{}", payload);
-                    let _ = text::Text::new_color(
-                        [0.0, 0.0, 0.0, 1.0],
-                        gui.label_helpers.slot_label_sizes[calc_index] as u32,
-                    )
-                    .draw(
-                        &to_draw,
-                        &mut font_cache.glyphs,
-                        &c.draw_state,
-                        transform,
-                        g,
-                    );
-                }
-                None => {}
-            };
+            if let Some(payload) = x {
+                let px = slot.get_position().x;
+                let py = slot.get_position().y;
+                let transform = c.transform.trans(
+                    gui.label_helpers.slot_label_x_offsets[calc_index](px),
+                    gui.label_helpers.slot_label_y_offsets[calc_index](py),
+                );
+                let to_draw = format!("{}", payload);
+                let _ = text::Text::new_color(
+                    [0.0, 0.0, 0.0, 1.0],
+                    gui.label_helpers.slot_label_sizes[calc_index] as u32,
+                )
+                .draw(
+                    &to_draw,
+                    &mut font_cache.glyphs,
+                    &c.draw_state,
+                    transform,
+                    g,
+                );
+            }
             calc_index += 1;
         });
     })
