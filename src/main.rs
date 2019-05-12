@@ -185,14 +185,19 @@ fn paint_slots_body<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm
 where
     G: piston_window::Graphics,
 {
-    paint_objects!(
-        game.get_slots(),
-        rectangle,
-        c,
-        g,
-        [0.0, 1.0, 0.0, 1.0],
-        SLOT_SIZE
-    );
+    game.get_slots().iter().for_each(|&i| {
+        rectangle(
+            if i.is_taken_care_of() { [0.0, 1.0, 0.0, 1.0] } else { [0.0, 0.5, 0.0, 1.0]},
+            [
+                i.get_position().x - SLOT_SIZE / 2.0,
+                i.get_position().y - SLOT_SIZE / 2.0,
+                SLOT_SIZE,
+                SLOT_SIZE,
+            ],
+            c.transform,
+            g,
+        )
+    })
 }
 
 fn carrier_state_to_string(state: swarm::State) -> &'static str {
@@ -387,12 +392,20 @@ fn main() {
 
     let mut game = swarm::new();
 
+    /*
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
     game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
     game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
     game.add_slot(slot!(750.0, 350.0, None, Some('B')));
+    */
+
+    game.add_carrier(carrier!(50.0, 50.0));
+
+    game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
+    game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
+    game.add_slot(slot!(400.0, 100.0, None, None));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
