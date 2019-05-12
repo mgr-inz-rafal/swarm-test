@@ -7,7 +7,7 @@ use piston_window::{
     TextureSettings, Transformed, WindowSettings,
 };
 use std::time::Instant;
-use swarm::{Carrier, Slot};
+use swarm::{Carrier, Payload, Slot};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
@@ -187,7 +187,11 @@ where
 {
     game.get_slots().iter().for_each(|&i| {
         rectangle(
-            if i.is_taken_care_of() { [0.0, 1.0, 0.0, 1.0] } else { [0.0, 0.5, 0.0, 1.0]},
+            if i.is_taken_care_of() {
+                [0.0, 1.0, 0.0, 1.0]
+            } else {
+                [0.0, 0.5, 0.0, 1.0]
+            },
             [
                 i.get_position().x - SLOT_SIZE / 2.0,
                 i.get_position().y - SLOT_SIZE / 2.0,
@@ -231,7 +235,7 @@ fn paint_carriers_payload<G>(
                 (gui.label_helpers.carrier_label_x_offset)(px),
                 (gui.label_helpers.carrier_label_y_offset)(py),
             );
-            let to_draw = format!("{}", payload);
+            let to_draw = format!("{}", payload.cargo);
             let _ = text::Text::new_color(
                 [0.0, 0.0, 0.0, 1.0],
                 gui.label_helpers.carrier_label_size as u32,
@@ -297,7 +301,7 @@ fn paint_slots_payloads<G>(
                     gui.label_helpers.slot_label_x_offsets[calc_index](px),
                     gui.label_helpers.slot_label_y_offsets[calc_index](py),
                 );
-                let to_draw = format!("{}", payload);
+                let to_draw = format!("{}", payload.cargo);
                 let _ = text::Text::new_color(
                     [0.0, 0.0, 0.0, 1.0],
                     gui.label_helpers.slot_label_sizes[calc_index] as u32,
@@ -392,20 +396,30 @@ fn main() {
 
     let mut game = swarm::new();
 
-    /*
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
-    game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
-    game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
-    game.add_slot(slot!(750.0, 350.0, None, Some('B')));
-    */
+    game.add_slot(slot!(
+        200.0,
+        200.0,
+        Some(Payload::from_char('B')),
+        Some(Payload::from_char('A'))
+    ));
+    game.add_slot(slot!(
+        210.0,
+        300.0,
+        Some(Payload::from_char('A')),
+        Some(Payload::from_char('B'))
+    ));
+    game.add_slot(slot!(750.0, 350.0, None, Some(Payload::from_char('B'))));
 
+    /*
     game.add_carrier(carrier!(50.0, 50.0));
 
-    game.add_slot(slot!(200.0, 200.0, Some('B'), Some('A')));
-    game.add_slot(slot!(210.0, 300.0, Some('A'), Some('B')));
+    game.add_slot(slot!(200.0, 200.0, Some(Payload::from_char('B')), Some(Payload::from_char('A'))));
+    game.add_slot(slot!(210.0, 300.0, Some(Payload::from_char('A')), Some(Payload::from_char('B'))));
     game.add_slot(slot!(400.0, 100.0, None, None));
+    */
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
