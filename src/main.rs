@@ -396,6 +396,7 @@ fn main() {
 
     let mut game = swarm::new();
 
+    /*
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
@@ -412,14 +413,24 @@ fn main() {
         Some(Payload::from_char('B'))
     ));
     game.add_slot(slot!(750.0, 350.0, None, Some(Payload::from_char('B'))));
+    */
 
-    /*
+    game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(50.0, 50.0));
 
-    game.add_slot(slot!(200.0, 200.0, Some(Payload::from_char('B')), Some(Payload::from_char('A'))));
-    game.add_slot(slot!(210.0, 300.0, Some(Payload::from_char('A')), Some(Payload::from_char('B'))));
+    game.add_slot(slot!(
+        200.0,
+        200.0,
+        Some(Payload::from_char('B')),
+        Some(Payload::from_char('A'))
+    ));
+    game.add_slot(slot!(
+        210.0,
+        300.0,
+        Some(Payload::from_char('A')),
+        Some(Payload::from_char('B'))
+    ));
     game.add_slot(slot!(400.0, 100.0, None, None));
-    */
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
