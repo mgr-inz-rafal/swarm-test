@@ -6,6 +6,8 @@ use piston_window::{
     clear, ellipse, line, rectangle, text, Event, Glyphs, Graphics, PistonWindow, Size,
     TextureSettings, Transformed, WindowSettings,
 };
+use std::fs::File;
+use std::io::{BufRead, BufReader, Error, Read, Result};
 use std::time::Instant;
 use swarm::{Carrier, Payload, Slot};
 
@@ -365,6 +367,37 @@ fn game_painter(
     });
 }
 
+fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
+    let file = File::open(file)?;
+    let mut buffer = BufReader::new(file);
+
+    let width = buffer.by_ref().lines().next().unwrap().unwrap();
+    let height = buffer.by_ref().lines().next().unwrap().unwrap();
+    let _ = buffer.by_ref().lines().next().unwrap().unwrap(); // Separator
+
+    let mut source = Vec::new();
+    for line in buffer
+        .by_ref()
+        .lines()
+        .take(height.parse::<usize>().unwrap())
+    {
+        source.push(line);
+    }
+
+    let _ = buffer.by_ref().lines().next().unwrap().unwrap(); // Separator
+
+    let mut target = Vec::new();
+    for line in buffer
+        .by_ref()
+        .lines()
+        .take(height.parse::<usize>().unwrap())
+    {
+        target.push(line);
+    }
+
+    Ok(())
+}
+
 fn main() {
     let mut gui = GuiData {
         width: 800,
@@ -397,6 +430,9 @@ fn main() {
     let mut game = swarm::new();
 
     /*
+
+    TEST CASE 1
+
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(100.0, 90.0));
 
@@ -415,6 +451,11 @@ fn main() {
     game.add_slot(slot!(750.0, 350.0, None, Some(Payload::from_char('B'))));
     */
 
+    /*
+
+    TEST CASE 2 - here we need to add logic to swap target mi-transfer
+    when another slot with better match is freed
+
     game.add_carrier(carrier!(50.0, 50.0));
     game.add_carrier(carrier!(50.0, 50.0));
 
@@ -431,6 +472,11 @@ fn main() {
         Some(Payload::from_char('B'))
     ));
     game.add_slot(slot!(400.0, 100.0, None, None));
+    */
+
+    if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
+        panic!(e.to_string());
+    }
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
