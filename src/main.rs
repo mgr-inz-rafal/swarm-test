@@ -7,7 +7,7 @@ use piston_window::{
     TextureSettings, Transformed, WindowSettings,
 };
 use std::fs::File;
-use std::io::{BufRead, BufReader, Error, Read, Result};
+use std::io::{BufRead, BufReader, Read, Result};
 use std::time::Instant;
 use swarm::{Carrier, Payload, Slot};
 
@@ -17,6 +17,7 @@ const TARGET_SIZE: f64 = 10.0;
 const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
+const NULL_SLOT_PAYLOAD_CHAR: char = '^';
 
 struct LabelHelpers {
     slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
@@ -371,7 +372,7 @@ fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
     let file = File::open(file)?;
     let mut buffer = BufReader::new(file);
 
-    let width = buffer.by_ref().lines().next().unwrap().unwrap();
+    let _ = buffer.by_ref().lines().next().unwrap().unwrap();
     let height = buffer.by_ref().lines().next().unwrap().unwrap();
     let _ = buffer.by_ref().lines().next().unwrap().unwrap(); // Separator
 
@@ -399,11 +400,21 @@ fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
         let source_chars: Vec<char> = sv.as_ref().unwrap().chars().collect();
         let target_chars: Vec<char> = target[si].as_ref().unwrap().chars().collect();
         for (ti, tv) in source_chars.iter().enumerate() {
+            let source_payload = if *tv == NULL_SLOT_PAYLOAD_CHAR {
+                None
+            } else {
+                Some(Payload::from_char(*tv))
+            };
+            let target_payload = if target_chars[ti] == NULL_SLOT_PAYLOAD_CHAR {
+                None
+            } else {
+                Some(Payload::from_char(target_chars[ti]))
+            };
             game.add_slot(slot!(
                 SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
                 SLOT_SIZE as f64 * 2.0 + si as f64 * (SLOT_SIZE as f64 * 1.1),
-                Some(Payload::from_char(*tv)),
-                Some(Payload::from_char(target_chars[ti]))
+                source_payload,
+                target_payload
             ));
         }
     }
@@ -490,6 +501,8 @@ fn main() {
     if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
         panic!(e.to_string());
     }
+
+    game.add_carrier(carrier!(50.0, 50.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
