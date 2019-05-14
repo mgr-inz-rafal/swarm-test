@@ -395,6 +395,19 @@ fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
         target.push(line);
     }
 
+    for (si, sv) in source.iter().enumerate() {
+        let source_chars: Vec<char> = sv.as_ref().unwrap().chars().collect();
+        let target_chars: Vec<char> = target[si].as_ref().unwrap().chars().collect();
+        for (ti, tv) in source_chars.iter().enumerate() {
+            game.add_slot(slot!(
+                SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
+                SLOT_SIZE as f64 * 2.0 + si as f64 * (SLOT_SIZE as f64 * 1.1),
+                Some(Payload::from_char(*tv)),
+                Some(Payload::from_char(target_chars[ti]))
+            ));
+        }
+    }
+
     Ok(())
 }
 
