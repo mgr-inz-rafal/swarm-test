@@ -89,7 +89,7 @@ fn game_loop(
     }
 }
 
-fn game_logic(world: &mut WorldState) {
+fn game_logic(_world: &mut WorldState) {
     // Mutate world state here
 }
 
