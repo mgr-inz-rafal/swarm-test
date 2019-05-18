@@ -1,0 +1,10 @@
+3
+3
+
+ABC
+D^F
+GHI
+
+GHI
+D^F
+ABC

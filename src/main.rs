@@ -476,9 +476,7 @@ fn main() {
     */
 
     /*
-
-    TEST CASE 2 - here we need to add logic to swap target mi-transfer
-    when another slot with better match is freed
+    // TEST CASE 2 - reconsidering target when going with cargo to temporary slot
 
     game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
@@ -502,6 +500,9 @@ fn main() {
         panic!(e.to_string());
     }
 
+    game.add_carrier(make_carrier!(50.0, 50.0));
+    game.add_carrier(make_carrier!(50.0, 50.0));
+    game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
 
     let window = create_window(&gui);
