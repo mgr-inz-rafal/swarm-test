@@ -1,4 +1,4 @@
-#[macro_use(make_carrier, make_slot)]
+#[macro_use(make_carrier, make_slot, make_slot_pit)]
 extern crate swarm;
 extern crate piston_window;
 
@@ -9,7 +9,7 @@ use piston_window::{
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Result};
 use std::time::Instant;
-use swarm::{Carrier, Payload, Slot};
+use swarm::{Carrier, Payload, Slot, SlotKind};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
@@ -190,7 +190,9 @@ where
 {
     game.get_slots().iter().for_each(|&i| {
         rectangle(
-            if i.is_taken_care_of() {
+            if i.is_pit() {
+                [0.2, 0.2, 0.2, 1.0]
+            } else if i.is_taken_care_of() {
                 [0.0, 1.0, 0.0, 1.0]
             } else {
                 [0.0, 0.5, 0.0, 1.0]
@@ -454,52 +456,29 @@ fn main() {
     let mut game = swarm::new();
 
     /*
+        game.add_carrier(make_carrier!(50.0, 50.0));
+        game.add_carrier(make_carrier!(50.0, 50.0));
 
-    TEST CASE 1
-
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(100.0, 90.0));
-
-    game.add_slot(make_slot!(
-        200.0,
-        200.0,
-        Some(Payload::from_char('B')),
-        Some(Payload::from_char('A'))
-    ));
-    game.add_slot(make_slot!(
-        210.0,
-        300.0,
-        Some(Payload::from_char('A')),
-        Some(Payload::from_char('B'))
-    ));
-    game.add_slot(make_slot!(750.0, 350.0, None, Some(Payload::from_char('B'))));
-    */
-
-    /*
-    // TEST CASE 2 - reconsidering target when going with cargo to temporary slot
-
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-
-    game.add_slot(make_slot!(
-        200.0,
-        200.0,
-        Some(Payload::from_char('B')),
-        Some(Payload::from_char('A'))
-    ));
-    game.add_slot(make_slot!(
-        210.0,
-        300.0,
-        Some(Payload::from_char('A')),
-        Some(Payload::from_char('B'))
-    ));
-    game.add_slot(make_slot!(400.0, 100.0, None, None));
+        game.add_slot(make_slot!(
+            200.0,
+            200.0,
+            Some(Payload::from_char('B')),
+            Some(Payload::from_char('A'))
+        ));
+        game.add_slot(make_slot!(
+            210.0,
+            300.0,
+            Some(Payload::from_char('A')),
+            Some(Payload::from_char('B'))
+        ));
+        game.add_slot(make_slot!(300.0, 150.0, None, None));
     */
 
     if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
         panic!(e.to_string());
     }
 
+    game.add_slot(make_slot_pit!(500.0, 500.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
