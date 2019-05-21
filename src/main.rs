@@ -191,7 +191,7 @@ where
     game.get_slots().iter().for_each(|&i| {
         rectangle(
             if i.is_pit() {
-                [0.2, 0.2, 0.2, 1.0]
+                [0.4, 0.4, 0.4, 1.0]
             } else if i.is_taken_care_of() {
                 [0.0, 1.0, 0.0, 1.0]
             } else {
