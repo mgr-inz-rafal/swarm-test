@@ -1,4 +1,4 @@
-#[macro_use(make_carrier, make_slot, make_slot_pit)]
+#[macro_use(make_carrier, make_slot, make_slot_pit, make_slot_spawner)]
 extern crate swarm;
 extern crate piston_window;
 
@@ -192,6 +192,8 @@ where
         rectangle(
             if i.is_pit() {
                 [0.4, 0.4, 0.4, 1.0]
+            } else if i.is_spawner() {
+                [0.8, 0.8, 0.8, 1.0]
             } else if i.is_taken_care_of() {
                 [0.0, 1.0, 0.0, 1.0]
             } else {
@@ -474,14 +476,12 @@ fn main() {
         game.add_slot(make_slot!(300.0, 150.0, None, None));
     */
 
-    if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
+    if let Err(e) = load_slots_from_file("test_layouts/test03.txt", &mut game) {
         panic!(e.to_string());
     }
 
-    game.add_slot(make_slot_pit!(500.0, 500.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
+    game.add_slot(make_slot_pit!(217.0, 217.0));
+    game.add_slot(make_slot_spawner!(278.0, 217.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
 
     let window = create_window(&gui);
