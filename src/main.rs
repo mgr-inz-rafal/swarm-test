@@ -19,6 +19,8 @@ const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 const NULL_SLOT_PAYLOAD_CHAR: char = '^';
 
+type MyGameType = swarm::Swarm<char>;
+
 struct LabelHelpers {
     slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
     slot_label_y_offsets: [Box<Fn(f64) -> f64>; 2],
@@ -63,10 +65,10 @@ fn game_loop(
     mut window: PistonWindow,
     mut font_cache: &mut FontCache,
     gui: &mut GuiData,
-    mut game: swarm::Swarm<char>,
+    mut game: MyGameType,
     mut world: WorldState,
     logic: &Fn(&mut WorldState),
-    paint: &Fn(&mut PistonWindow, &mut FontCache, &swarm::Swarm<char>, &GuiData, Event),
+    paint: &Fn(&mut PistonWindow, &mut FontCache, &MyGameType, &GuiData, Event),
 ) {
     while let Some(event) = window.next() {
         logic(&mut world);
@@ -109,7 +111,7 @@ macro_rules! paint_objects {
     };
 }
 
-fn paint_carriers_body<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm<char>)
+fn paint_carriers_body<G>(c: piston_window::Context, g: &mut G, game: &MyGameType)
 where
     G: piston_window::Graphics,
 {
@@ -130,7 +132,7 @@ fn rotate_point(point: (f64, f64), angle: f64, center: (f64, f64)) -> (f64, f64)
     )
 }
 
-fn paint_carriers_angle<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm<char>)
+fn paint_carriers_angle<G>(c: piston_window::Context, g: &mut G, game: &MyGameType)
 where
     G: piston_window::Graphics,
 {
@@ -150,7 +152,7 @@ where
     });
 }
 
-fn paint_carriers_target<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm<char>)
+fn paint_carriers_target<G>(c: piston_window::Context, g: &mut G, game: &MyGameType)
 where
     G: piston_window::Graphics,
 {
@@ -184,7 +186,7 @@ where
         });
 }
 
-fn paint_slots_body<G>(c: piston_window::Context, g: &mut G, game: &swarm::Swarm<char>)
+fn paint_slots_body<G>(c: piston_window::Context, g: &mut G, game: &MyGameType)
 where
     G: piston_window::Graphics,
 {
@@ -229,7 +231,7 @@ fn paint_carriers_payload<G>(
     c: piston_window::Context,
     g: &mut G,
     font_cache: &mut FontCache,
-    game: &swarm::Swarm<char>,
+    game: &MyGameType,
     gui: &GuiData,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
@@ -262,7 +264,7 @@ fn paint_carriers_state<G>(
     c: piston_window::Context,
     g: &mut G,
     font_cache: &mut FontCache,
-    game: &swarm::Swarm<char>,
+    game: &MyGameType,
     gui: &GuiData,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
@@ -293,7 +295,7 @@ fn paint_slots_payloads<G>(
     c: piston_window::Context,
     g: &mut G,
     font_cache: &mut FontCache,
-    game: &swarm::Swarm<char>,
+    game: &MyGameType,
     gui: &GuiData,
 ) where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
@@ -355,7 +357,7 @@ where
 fn game_painter(
     wnd: &mut PistonWindow,
     mut font_cache: &mut FontCache,
-    game: &swarm::Swarm<char>,
+    game: &MyGameType,
     gui: &GuiData,
     e: Event,
 ) {
@@ -372,7 +374,7 @@ fn game_painter(
     });
 }
 
-fn load_slots_from_file(file: &str, game: &mut swarm::Swarm<char>) -> Result<()> {
+fn load_slots_from_file(file: &str, game: &mut MyGameType) -> Result<()> {
     let file = File::open(file)?;
     let mut buffer = BufReader::new(file);
 
