@@ -407,24 +407,18 @@ fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
             let source_payload = if *tv == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                //Some(Payload::from_char(*tv))
-                Some(
-                    Payload {
-                        cargo: *tv,
-                        taken_from: None
-                    }
-                )
+                Some(Payload {
+                    cargo: *tv,
+                    taken_from: None,
+                })
             };
             let target_payload = if target_chars[ti] == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                //Some(Payload::from_char(target_chars[ti]))
-                Some(
-                    Payload {
-                        cargo: target_chars[ti],
-                        taken_from: None
-                    }
-                )
+                Some(Payload {
+                    cargo: target_chars[ti],
+                    taken_from: None,
+                })
             };
             game.add_slot(make_slot!(
                 SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
