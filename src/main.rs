@@ -407,12 +407,24 @@ fn load_slots_from_file(file: &str, game: &mut swarm::Swarm) -> Result<()> {
             let source_payload = if *tv == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                Some(Payload::from_char(*tv))
+                //Some(Payload::from_char(*tv))
+                Some(
+                    Payload {
+                        cargo: *tv,
+                        taken_from: None
+                    }
+                )
             };
             let target_payload = if target_chars[ti] == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                Some(Payload::from_char(target_chars[ti]))
+                //Some(Payload::from_char(target_chars[ti]))
+                Some(
+                    Payload {
+                        cargo: target_chars[ti],
+                        taken_from: None
+                    }
+                )
             };
             game.add_slot(make_slot!(
                 SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
@@ -476,19 +488,12 @@ fn main() {
         game.add_slot(make_slot!(300.0, 150.0, None, None));
     */
 
-    if let Err(e) = load_slots_from_file("test_layouts/test04.txt", &mut game) {
+    if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
         panic!(e.to_string());
     }
 
     game.add_slot(make_slot_pit!(417.0, 417.0));
     game.add_slot(make_slot_spawner!(578.0, 517.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
     game.add_carrier(make_carrier!(50.0, 50.0));
