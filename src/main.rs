@@ -1,4 +1,4 @@
-#[macro_use(make_carrier, make_slot, make_slot_pit, make_slot_spawner)]
+#[macro_use(make_slot, make_slot_pit, make_slot_spawner)]
 extern crate swarm;
 extern crate piston_window;
 
@@ -493,11 +493,11 @@ fn main() {
 
     game.add_slot(make_slot_pit!(417.0, 417.0));
     game.add_slot(make_slot_spawner!(578.0, 517.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
-    game.add_carrier(make_carrier!(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
