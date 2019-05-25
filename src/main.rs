@@ -156,10 +156,9 @@ fn paint_carriers_target<G>(c: piston_window::Context, g: &mut G, game: &MyGameT
 where
     G: piston_window::Graphics,
 {
-    game.get_carriers()
-        .iter()
-        .for_each(|&x| match x.get_target() {
-            Some(target) => {
+    game.get_carriers().iter().for_each(|&x| {
+        if let Some(target) = x.get_target() {
+            {
                 let target = game.get_slots()[target].get_position();
                 let position = x.get_position();
                 line(
@@ -182,8 +181,8 @@ where
                     g,
                 )
             }
-            None => {}
-        });
+        }
+    });
 }
 
 fn paint_slots_body<G>(c: piston_window::Context, g: &mut G, game: &MyGameType)
@@ -276,7 +275,7 @@ fn paint_carriers_state<G>(
             (gui.label_helpers.carrier_state_x_offset)(px),
             (gui.label_helpers.carrier_state_y_offset)(py),
         );
-        let to_draw = format!("{}", carrier_state_to_string(carrier.get_state()));
+        let to_draw = carrier_state_to_string(carrier.get_state());
         let _ = text::Text::new_color(
             [0.0, 0.0, 0.0, 1.0],
             gui.label_helpers.carrier_state_size as u32,
@@ -333,7 +332,9 @@ where
     G: Graphics<Texture = gfx_texture::Texture<gfx_device_gl::Resources>>,
 {
     let mut stats_position = 20.0;
-    let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
+    let transform = c
+        .transform
+        .trans(f64::from(gui.width - 100), stats_position);
     let to_draw = format!("{} fps", gui.fps_current);
     let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
         &to_draw,
@@ -343,7 +344,9 @@ where
         g,
     );
     stats_position += 20.0;
-    let transform = c.transform.trans((gui.width - 100) as f64, stats_position);
+    let transform = c
+        .transform
+        .trans(f64::from(gui.width - 100), stats_position);
     let _ = text::Text::new_color([0.0, 0.0, 0.0, 1.0], 16).draw(
         "next stat",
         &mut font_cache.glyphs,
