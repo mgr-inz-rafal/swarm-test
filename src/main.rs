@@ -6,6 +6,7 @@ use piston_window::{
     clear, ellipse, line, rectangle, text, Event, Glyphs, Graphics, PistonWindow, Size,
     TextureSettings, Transformed, WindowSettings,
 };
+
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Result};
 use std::time::Instant;
@@ -76,11 +77,12 @@ fn game_loop(
         gui.fps_counter += 1;
 
         let now = Instant::now();
-        let tick_duration = now - world.time_since_last_tick;
-        if tick_duration.as_millis() >= SIMULATION_TICKER {
+        let mut tick_duration = now - world.time_since_last_tick;
+        while tick_duration.as_millis() >= SIMULATION_TICKER {
             game.tick();
-            world.time_since_last_tick = Instant::now();
+            tick_duration -= std::time::Duration::from_millis(SIMULATION_TICKER as u64);
         }
+        world.time_since_last_tick = Instant::now() - tick_duration;
 
         let fps_duration = now - world.time_since_last_paint;
         if fps_duration.as_secs() >= 1 {
@@ -494,8 +496,6 @@ fn main() {
 
     game.add_slot(make_slot_pit!(417.0, 417.0));
     game.add_slot(make_slot_spawner!(578.0, 517.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
     game.add_carrier(Carrier::new(50.0, 50.0));
     game.add_carrier(Carrier::new(50.0, 50.0));
     game.add_carrier(Carrier::new(50.0, 50.0));
