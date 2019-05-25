@@ -1,4 +1,4 @@
-#[macro_use(make_slot, make_slot_pit, make_slot_spawner)]
+#[macro_use(make_slot_pit, make_slot_spawner)]
 extern crate swarm;
 extern crate piston_window;
 
@@ -425,11 +425,12 @@ fn load_slots_from_file(file: &str, game: &mut MyGameType) -> Result<()> {
                     taken_from: None,
                 })
             };
-            game.add_slot(make_slot!(
+            game.add_slot(Slot::new(
                 SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
                 SLOT_SIZE as f64 * 2.0 + si as f64 * (SLOT_SIZE as f64 * 1.1),
                 source_payload,
-                target_payload
+                target_payload,
+                swarm::SlotKind::CLASSIC,
             ));
         }
     }
