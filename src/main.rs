@@ -490,15 +490,15 @@ fn main() {
         game.add_slot(make_slot!(300.0, 150.0, None, None));
     */
 
-    if let Err(e) = load_slots_from_file("test_layouts/test01.txt", &mut game) {
+    if let Err(e) = load_slots_from_file("test_layouts/test05.txt", &mut game) {
         panic!(e.to_string());
     }
 
-    game.add_slot(make_slot_pit!(417.0, 417.0));
-    game.add_slot(make_slot_spawner!(578.0, 517.0));
+    //    game.add_slot(make_slot_pit!(417.0, 417.0));
+    //    game.add_slot(make_slot_spawner!(578.0, 517.0));
     game.add_carrier(Carrier::new(50.0, 50.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
+    //    game.add_carrier(Carrier::new(50.0, 50.0));
+    //    game.add_carrier(Carrier::new(50.0, 50.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
