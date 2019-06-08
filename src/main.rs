@@ -494,8 +494,8 @@ fn main() {
         panic!(e.to_string());
     }
 
-    //    game.add_slot(make_slot_pit!(417.0, 417.0));
-    //    game.add_slot(make_slot_spawner!(578.0, 517.0));
+    game.add_slot(make_slot_pit!(0.0, 0.0));
+    game.add_slot(make_slot_spawner!(100.0, 0.0));
     game.add_carrier(Carrier::new(50.0, 50.0));
     //    game.add_carrier(Carrier::new(50.0, 50.0));
     //    game.add_carrier(Carrier::new(50.0, 50.0));
