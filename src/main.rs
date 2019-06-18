@@ -15,7 +15,7 @@ use swarm::{Carrier, Payload, Slot, SlotKind};
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
+const SIMULATION_TICKER: u128 = (1000.0 / 10.0) as u128; // 60 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 const NULL_SLOT_PAYLOAD_CHAR: char = '^';
@@ -471,34 +471,34 @@ fn main() {
 
     let mut game = swarm::Swarm::new();
 
+    game.add_carrier(Carrier::new(50.0, 50.0));
+
+    game.add_slot(Slot::new(
+        200.0,
+        200.0,
+        Some(Payload::new('B')),
+        Some(Payload::new('A')),
+        SlotKind::CLASSIC,
+    ));
+    game.add_slot(Slot::new(
+        210.0,
+        300.0,
+        Some(Payload::new('A')),
+        Some(Payload::new('B')),
+        SlotKind::CLASSIC,
+    ));
+    game.add_slot(Slot::new(600.0, 550.0, None, None, SlotKind::CLASSIC));
+    game.add_slot(Slot::new(500.0, 450.0, None, None, SlotKind::CLASSIC));
+    game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
+
     /*
-        game.add_carrier(make_carrier!(50.0, 50.0));
-        game.add_carrier(make_carrier!(50.0, 50.0));
-
-        game.add_slot(make_slot!(
-            200.0,
-            200.0,
-            Some(Payload::from_char('B')),
-            Some(Payload::from_char('A'))
-        ));
-        game.add_slot(make_slot!(
-            210.0,
-            300.0,
-            Some(Payload::from_char('A')),
-            Some(Payload::from_char('B'))
-        ));
-        game.add_slot(make_slot!(300.0, 150.0, None, None));
-    */
-
-    if let Err(e) = load_slots_from_file("test_layouts/test05.txt", &mut game) {
+    if let Err(e) = load_slots_from_file("test_layouts/test04.txt", &mut game) {
         panic!(e.to_string());
     }
+    */
 
     game.add_slot(make_slot_pit!(0.0, 0.0));
     game.add_slot(make_slot_spawner!(100.0, 0.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
-    //    game.add_carrier(Carrier::new(50.0, 50.0));
-    //    game.add_carrier(Carrier::new(50.0, 50.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
