@@ -1,5 +1,5 @@
 #[macro_use(make_slot_pit, make_slot_spawner)]
-extern crate swarm;
+extern crate swarm_it;
 extern crate piston_window;
 
 use piston_window::{
@@ -10,17 +10,17 @@ use piston_window::{
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Result};
 use std::time::Instant;
-use swarm::{Carrier, Payload, Slot, SlotKind};
+use swarm_it::{Carrier, Payload, Slot, SlotKind};
 
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 10.0) as u128; // 60 FPS
+const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 const NULL_SLOT_PAYLOAD_CHAR: char = '^';
 
-type MyGameType = swarm::Swarm<char>;
+type MyGameType = swarm_it::Swarm<char>;
 
 struct LabelHelpers {
     slot_label_x_offsets: [Box<Fn(f64) -> f64>; 2],
@@ -214,17 +214,17 @@ where
     })
 }
 
-fn carrier_state_to_string(state: swarm::State) -> &'static str {
+fn carrier_state_to_string(state: swarm_it::State) -> &'static str {
     match state {
-        swarm::State::IDLE => "Idle",
-        swarm::State::TARGETING(_) => "Targeting",
-        swarm::State::MOVING(_) => "Moving",
-        swarm::State::PICKINGUP(_) => "Picking up",
-        swarm::State::LOOKINGFORTARGET => "Looking where to drop",
-        swarm::State::NOTARGET => "Can't find target to drop",
-        swarm::State::DELIVERING(_) => "Delivering payload",
-        swarm::State::PUTTINGDOWN(_) => "Putting down",
-        swarm::State::_DEBUG_ => "Beret",
+        swarm_it::State::IDLE => "Idle",
+        swarm_it::State::TARGETING(_) => "Targeting",
+        swarm_it::State::MOVING(_) => "Moving",
+        swarm_it::State::PICKINGUP(_) => "Picking up",
+        swarm_it::State::LOOKINGFORTARGET => "Looking where to drop",
+        swarm_it::State::NOTARGET => "Can't find target to drop",
+        swarm_it::State::DELIVERING(_) => "Delivering payload",
+        swarm_it::State::PUTTINGDOWN(_) => "Putting down",
+        swarm_it::State::_DEBUG_ => "Beret",
     }
 }
 
@@ -432,7 +432,7 @@ fn load_slots_from_file(file: &str, game: &mut MyGameType) -> Result<()> {
                 SLOT_SIZE as f64 * 2.0 + si as f64 * (SLOT_SIZE as f64 * 1.1),
                 source_payload,
                 target_payload,
-                swarm::SlotKind::CLASSIC,
+                swarm_it::SlotKind::CLASSIC,
             ));
         }
     }
@@ -469,7 +469,7 @@ fn main() {
         time_since_last_paint: Instant::now(),
     };
 
-    let mut game = swarm::Swarm::new();
+    let mut game = swarm_it::Swarm::new();
 
     game.add_carrier(Carrier::new(50.0, 50.0));
 

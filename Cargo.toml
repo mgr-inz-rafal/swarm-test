@@ -10,4 +10,4 @@ piston-gfx_texture = "*"
 gfx_device_gl = "0.15.0"
 gfx = "0.17.1"
 piston2d-gfx_graphics = "*"
-swarm = { path = "../swarm" }
+swarm_it = { path = "../swarm" }
