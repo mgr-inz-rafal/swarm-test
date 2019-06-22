@@ -414,18 +414,12 @@ fn load_slots_from_file(file: &str, game: &mut MyGameType) -> Result<()> {
             let source_payload = if *tv == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                Some(Payload {
-                    cargo: *tv,
-                    taken_from: None,
-                })
+                Some(Payload::new(*tv))
             };
             let target_payload = if target_chars[ti] == NULL_SLOT_PAYLOAD_CHAR {
                 None
             } else {
-                Some(Payload {
-                    cargo: target_chars[ti],
-                    taken_from: None,
-                })
+                Some(Payload::new(target_chars[ti]))
             };
             game.add_slot(Slot::new(
                 SLOT_SIZE as f64 * 2.0 + ti as f64 * (SLOT_SIZE as f64 * 1.1),
