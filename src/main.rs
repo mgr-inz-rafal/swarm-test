@@ -15,7 +15,7 @@ use swarm_it::{Carrier, Payload, Slot, SlotKind};
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 60.0) as u128; // 60 FPS
+const SIMULATION_TICKER: u128 = (1000.0 / 30.0) as u128; // 30 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 const NULL_SLOT_PAYLOAD_CHAR: char = '^';
@@ -470,19 +470,24 @@ fn main() {
     game.add_slot(Slot::new(
         200.0,
         200.0,
-        Some(Payload::new('B')),
+        Some(Payload::new('A')),
         Some(Payload::new('A')),
         SlotKind::CLASSIC,
     ));
     game.add_slot(Slot::new(
-        210.0,
+        250.0,
+        250.0,
+        Some(Payload::new('A')),
+        Some(Payload::new('A')),
+        SlotKind::CLASSIC,
+    ));
+    game.add_slot(Slot::new(
+        300.0,
         300.0,
         Some(Payload::new('A')),
         Some(Payload::new('B')),
         SlotKind::CLASSIC,
     ));
-    game.add_slot(Slot::new(600.0, 550.0, None, None, SlotKind::CLASSIC));
-    game.add_slot(Slot::new(500.0, 450.0, None, None, SlotKind::CLASSIC));
     game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
 
     /*
