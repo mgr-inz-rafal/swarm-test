@@ -466,29 +466,33 @@ fn main() {
     let mut game = swarm_it::Swarm::new();
 
     game.add_carrier(Carrier::new(50.0, 50.0));
+    game.add_carrier(Carrier::new(50.0, 50.0));
+//    game.add_carrier(Carrier::new(50.0, 50.0));
 
     game.add_slot(Slot::new(
         200.0,
         200.0,
         Some(Payload::new('A')),
-        Some(Payload::new('A')),
-        SlotKind::CLASSIC,
-    ));
-    game.add_slot(Slot::new(
-        250.0,
-        250.0,
-        Some(Payload::new('A')),
-        Some(Payload::new('A')),
+        None,
         SlotKind::CLASSIC,
     ));
     game.add_slot(Slot::new(
         300.0,
-        300.0,
+        250.0,
         Some(Payload::new('A')),
-        Some(Payload::new('B')),
+        None,
         SlotKind::CLASSIC,
     ));
-    game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
+    /*
+    game.add_slot(Slot::new(
+        400.0,
+        300.0,
+        Some(Payload::new('A')),
+        None,
+        SlotKind::CLASSIC,
+    ));
+    */
+//    game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
 
     /*
     if let Err(e) = load_slots_from_file("test_layouts/test04.txt", &mut game) {
