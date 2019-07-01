@@ -466,8 +466,6 @@ fn main() {
     let mut game = swarm_it::Swarm::new();
 
     game.add_carrier(Carrier::new(50.0, 50.0));
-    game.add_carrier(Carrier::new(50.0, 50.0));
-//    game.add_carrier(Carrier::new(50.0, 50.0));
 
     game.add_slot(Slot::new(
         200.0,
@@ -483,7 +481,6 @@ fn main() {
         None,
         SlotKind::CLASSIC,
     ));
-    /*
     game.add_slot(Slot::new(
         400.0,
         300.0,
@@ -491,8 +488,7 @@ fn main() {
         None,
         SlotKind::CLASSIC,
     ));
-    */
-//    game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
+    game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
 
     /*
     if let Err(e) = load_slots_from_file("test_layouts/test04.txt", &mut game) {
@@ -501,7 +497,8 @@ fn main() {
     */
 
     game.add_slot(make_slot_pit!(0.0, 0.0));
-    game.add_slot(make_slot_spawner!(100.0, 0.0));
+    game.add_slot(make_slot_pit!(500.0, 500.0));
+    //    game.add_slot(make_slot_spawner!(100.0, 0.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
