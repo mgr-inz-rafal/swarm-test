@@ -471,21 +471,21 @@ fn main() {
         200.0,
         200.0,
         Some(Payload::new('A')),
-        None,
+        Some(Payload::new('B')),
         SlotKind::CLASSIC,
     ));
     game.add_slot(Slot::new(
         300.0,
         250.0,
         Some(Payload::new('A')),
-        None,
+        Some(Payload::new('C')),
         SlotKind::CLASSIC,
     ));
     game.add_slot(Slot::new(
         400.0,
         300.0,
         Some(Payload::new('A')),
-        None,
+        Some(Payload::new('D')),
         SlotKind::CLASSIC,
     ));
     game.add_slot(Slot::new(300.0, 350.0, None, None, SlotKind::CLASSIC));
@@ -498,7 +498,8 @@ fn main() {
 
     game.add_slot(make_slot_pit!(0.0, 0.0));
     game.add_slot(make_slot_pit!(500.0, 500.0));
-    //    game.add_slot(make_slot_spawner!(100.0, 0.0));
+    game.add_slot(make_slot_spawner!(10.0, 10.0));
+    game.add_slot(make_slot_spawner!(450.0, 450.0));
 
     let window = create_window(&gui);
     let mut font_cache = FontCache {
