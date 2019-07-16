@@ -15,7 +15,7 @@ use swarm_it::{Carrier, Payload, Slot, SlotKind};
 const CARRIER_SIZE: f64 = 30.0;
 const SLOT_SIZE: f64 = 50.0;
 const TARGET_SIZE: f64 = 10.0;
-const SIMULATION_TICKER: u128 = (1000.0 / 30.0) as u128; // 30 FPS
+const SIMULATION_TICKER: u128 = (1000.0 / 10.0) as u128; // 30 FPS
 const CURRENT_PAYLOAD_FONT_SIZE: f64 = 24.0;
 const TARGET_PAYLOAD_FONT_SIZE: f64 = CURRENT_PAYLOAD_FONT_SIZE / 2.3;
 const NULL_SLOT_PAYLOAD_CHAR: char = '^';
