@@ -466,7 +466,7 @@ fn main() {
     let mut game = swarm_it::Swarm::new();
 
     let i = game.add_carrier(Carrier::new(50.0, 50.0));
-    game.set_carrier_acceleration(i, 2.0);
+    game.get_carriers_mut()[i].set_acceleration(2.0);
     game.set_carrier_max_speed(i, 50.0);
 
     game.add_slot(Slot::new(
